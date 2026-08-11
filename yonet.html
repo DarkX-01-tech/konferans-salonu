@@ -5,21 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Konferans Salonu - Yönetici</title>
   <style>
+    /* ===== Renk değişkenleri ===== */
     :root {
-      --bg: #f4f6fb;
-      --card: #ffffff;
-      --border: #dfe5ef;
-      --text: #1f2d3d;
-      --muted: #637083;
-      --green: #17a34a;
-      --purple: #7d4cff;
-      --gray: #7f8a9b;
-      --orange: #f09b1a;
-      --red: #d94141;
-      --blue: #2c7be5;
+      --bg:      #f0f4fa;
+      --card:    #ffffff;
+      --border:  #dde3ef;
+      --text:    #1f2d3d;
+      --muted:   #637083;
+      --green:   #17a34a;
+      --purple:  #7d4cff;
+      --gray:    #7f8a9b;
+      --orange:  #f09b1a;
+      --red:     #d94141;
+      --blue:    #2c7be5;
+      /* Önizleme kürsü renkleri */
+      --pv-bg-start: #dde8f5;
+      --pv-bg-end:   #eef3fa;
+      --pv-red:      #cc2029;
+      --pv-text:     #1b2736;
+      --pv-muted:    #4c5b6c;
     }
 
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -28,43 +36,106 @@
     }
 
     .container {
-      max-width: 1200px;
-      margin: 24px auto;
-      padding: 0 16px 24px;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px 16px 32px;
     }
 
+    h1 { margin: 0 0 20px; font-size: 26px; }
+
+    /* ===== ANA IZGARA: sol + sağ sütun ===== */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* Sütunlar */
+    .col-left, .col-right {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ===== KART ===== */
     .panel {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 18px;
-      box-shadow: 0 6px 16px rgba(20, 32, 62, 0.06);
+      padding: 20px;
+      box-shadow: 0 4px 14px rgba(20,32,62,0.07);
     }
 
-    h1 {
-      margin: 0 0 16px;
-      font-size: 28px;
+    .panel h2 {
+      margin: 0 0 14px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .5px;
     }
 
-    .field {
-      margin-bottom: 12px;
-    }
+    /* ===== FORM ALANLARI ===== */
+    .field { margin-bottom: 12px; }
 
     .field label {
       display: block;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
       font-weight: 700;
+      font-size: 13px;
       color: #2f3a4a;
     }
 
     .field input {
       width: 100%;
-      padding: 11px 12px;
+      padding: 10px 12px;
       border-radius: 8px;
       border: 1px solid #c9d2e1;
-      font-size: 16px;
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s;
     }
 
+    .field input::placeholder { color: #a9b4c5; }
+    .field input:focus        { border-color: var(--blue); }
+
+    /* ===== GLASSMORPHISM BUTONLAR =====
+       İdle: cam/nötr  → Hover: anlam rengi */
+    .btn {
+      border: 1.5px solid rgba(180,190,210,0.6);
+      border-radius: 9px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      cursor: pointer;
+      transition: background .2s, color .2s, border-color .2s, box-shadow .2s;
+    }
+
+    /* Hover renkleri: anlam renkli */
+    .btn-green-h:hover  { background: var(--green);  color: #fff; border-color: var(--green);  box-shadow: 0 4px 14px rgba(23,163,74,.28); }
+    .btn-purple-h:hover { background: var(--purple); color: #fff; border-color: var(--purple); box-shadow: 0 4px 14px rgba(125,76,255,.28); }
+    .btn-gray-h:hover   { background: var(--gray);   color: #fff; border-color: var(--gray);   box-shadow: 0 4px 14px rgba(127,138,155,.28); }
+    .btn-red-h:hover    { background: var(--red);    color: #fff; border-color: var(--red);    box-shadow: 0 4px 14px rgba(217,65,65,.28); }
+    .btn-blue-h:hover   { background: var(--blue);   color: #fff; border-color: var(--blue);   box-shadow: 0 4px 14px rgba(44,123,229,.28); }
+    .btn-orange-h:hover { background: var(--orange); color: #fff; border-color: var(--orange); box-shadow: 0 4px 14px rgba(240,155,26,.28); }
+
+    /* Ana yayın butonu — tam genişlik */
+    .btn-wide {
+      width: 100%;
+      padding: 13px;
+      font-size: 17px;
+      border-radius: 10px;
+      margin-top: 14px;
+      text-align: center;
+    }
+
+    /* Durum satırı butonlar */
     .row {
       display: flex;
       gap: 10px;
@@ -72,31 +143,23 @@
       flex-wrap: wrap;
     }
 
-    button {
-      border: 0;
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 14px;
+    /* Durum göstergesi */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
       font-weight: 700;
-      color: #fff;
-      cursor: pointer;
+      background: #eef0f6;
+      color: var(--muted);
     }
 
-    .btn-purple { background: var(--purple); }
-    .btn-gray { background: var(--gray); }
-    .btn-green {
-      background: var(--green);
-      width: 100%;
-      margin-top: 14px;
-      padding: 14px;
-      font-size: 18px;
-      border-radius: 10px;
-    }
+    .status-badge.live { background: #d4f5e1; color: var(--green); }
 
-    .lists {
-      margin-top: 16px;
+    /* ===== KAYIT LİSTELERİ ===== */
+    .lists-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap: 12px;
     }
 
@@ -105,7 +168,7 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 12px;
-      min-height: 180px;
+      min-height: 160px;
     }
 
     .list-head {
@@ -114,52 +177,60 @@
       align-items: center;
       margin-bottom: 8px;
       font-weight: 700;
+      font-size: 13px;
     }
 
     .add-btn {
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       padding: 0;
       border-radius: 50%;
+      border: none;
       background: var(--blue);
-      font-size: 20px;
+      color: #fff;
+      font-size: 18px;
       line-height: 1;
+      cursor: pointer;
     }
 
-    .items {
-      display: grid;
-      gap: 8px;
-    }
+    .items { display: grid; gap: 7px; }
 
     .item {
       border: 1px solid #d3dbea;
       border-radius: 8px;
-      padding: 8px;
+      padding: 7px 9px;
       background: #fbfdff;
     }
 
     .item-text {
-      font-size: 14px;
+      font-size: 13px;
       color: #2f3a4a;
       word-break: break-word;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
-    .item-actions {
-      display: flex;
-      gap: 6px;
-    }
+    .item-actions { display: flex; gap: 6px; }
 
     .btn-select {
       background: var(--orange);
-      padding: 6px 10px;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 9px;
       font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
     }
 
     .btn-delete {
       background: var(--red);
-      padding: 6px 10px;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 9px;
       font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
     }
 
     .empty {
@@ -168,262 +239,538 @@
       padding-top: 4px;
     }
 
-    @media (max-width: 980px) {
-      .lists { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    /* ===== CANLI ÖNİZLEME ===== */
+    .preview-wrapper {
+      /* 16:9 oran kutusu */
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      overflow: hidden;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, #dde8f5 0%, #eef3fa 100%);
+    }
+
+    /* iframe doğal boyutu 1280x720; küçük alana sığması için scale */
+    .preview-wrapper iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 1280px;
+      height: 720px;
+      border: none;
+      transform-origin: top left;
+      /* Scale değeri JS ile ayarlanacak; başlangıç için yaklaşık */
+      transform: scale(0.25);
+      pointer-events: none;
+    }
+
+    /* ===== SAYAÇ KARTI ===== */
+    .timer-display {
+      font-size: clamp(28px, 4vw, 52px);
+      font-weight: 900;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      letter-spacing: 3px;
+      margin: 10px 0;
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: #f4f6fb;
+      border: 1px solid var(--border);
+      color: var(--text);
+      transition: background .3s, color .3s;
+    }
+
+    .timer-display.warn   { background: #fff8e1; color: #b8860b; border-color: #ffe082; }
+    .timer-display.danger { background: #ffe5e5; color: var(--red); border-color: #ffb3b3; }
+    .timer-display.over   { background: var(--red); color: #fff; border-color: #b11622; }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    .timer-display.blink { animation: blink .7s linear infinite; }
+
+    .timer-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .timer-row input {
+      width: 64px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #c9d2e1;
+      font-size: 15px;
+      text-align: center;
+    }
+
+    /* ===== TOAST BİLDİRİMİ ===== */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #222d3e;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 6px 20px rgba(0,0,0,.22);
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity .3s, transform .3s;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 600px) {
-      .lists { grid-template-columns: 1fr; }
+      .lists-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <main class="container">
-    <section class="panel">
-      <h1>Yönetici Ekranı</h1>
 
-      <div class="field">
-        <label for="speakerInput">Konuşmacı</label>
-        <input id="speakerInput" type="text" placeholder="İsim soyisim..." />
-      </div>
+<main class="container">
+  <h1>🎛 Yönetici Paneli</h1>
 
-      <div class="field">
-        <label for="symposiumInput">Sempozyum [ALT YAZI]</label>
-        <input id="symposiumInput" type="text" placeholder="Sempozyum adı..." />
-      </div>
+  <div class="main-grid">
 
-      <div class="field">
-        <label for="topicInput">Toplantı Konusu [ÜST YAZI]</label>
-        <input id="topicInput" type="text" placeholder="Konu başlığı..." />
-      </div>
+    <!-- ============================
+         SOL SÜTUN: Yayın + Listeler
+         ============================ -->
+    <div class="col-left">
 
-      <div class="field">
-        <label for="tickerInput">Alt Yazı / Duyuru</label>
-        <input id="tickerInput" type="text" placeholder="Kayan metin mesajı..." />
-      </div>
+      <!-- Yayın Yönetimi kartı -->
+      <div class="panel">
+        <h2>Yayın Yönetimi</h2>
 
-      <div class="row">
-        <button class="btn-purple" id="publishTickerBtn" type="button">YAYINLA</button>
-        <button class="btn-gray" id="clearTickerBtn" type="button">KALDIR</button>
-      </div>
-
-      <button class="btn-green" id="sendLiveBtn" type="button">CANLI YAYINA GÖNDER</button>
-    </section>
-
-    <section class="lists">
-      <article class="list-card">
-        <div class="list-head">
-          <span>Konuşmacılar</span>
-          <button class="add-btn" data-list="speakers" type="button">+</button>
+        <div class="field">
+          <label for="symposiumInput">Seminer / Etkinlik / Toplantı İsmi</label>
+          <input id="symposiumInput" type="text"
+                 placeholder="Sempozyum veya etkinlik adı..." />
         </div>
-        <div class="items" id="speakersList"></div>
-      </article>
 
-      <article class="list-card">
-        <div class="list-head">
-          <span>Sempozyumlar</span>
-          <button class="add-btn" data-list="symposiums" type="button">+</button>
+        <div class="field">
+          <label for="topicInput">Seminer / Etkinlik / Toplantı Konusu</label>
+          <input id="topicInput" type="text"
+                 placeholder="Toplantı konusu..." />
         </div>
-        <div class="items" id="symposiumsList"></div>
-      </article>
 
-      <article class="list-card">
-        <div class="list-head">
-          <span>Konular</span>
-          <button class="add-btn" data-list="topics" type="button">+</button>
+        <div class="field">
+          <label for="speakerInput">Konuşmacı</label>
+          <input id="speakerInput" type="text"
+                 placeholder="Ad Soyad..." />
         </div>
-        <div class="items" id="topicsList"></div>
-      </article>
 
-      <article class="list-card">
-        <div class="list-head">
-          <span>Duyurular</span>
-          <button class="add-btn" data-list="announcements" type="button">+</button>
+        <div class="field">
+          <label for="tickerInput">Alt Yazı / Duyuru</label>
+          <input id="tickerInput" type="text"
+                 placeholder="Kayan bant duyuru metni..." />
         </div>
-        <div class="items" id="announcementsList"></div>
-      </article>
-    </section>
-  </main>
 
-  <script>
-    (function () {
-      const STORAGE_STATE_KEY = "konferans_state";
-      const STORAGE_LISTS_KEY = "konferans_lists";
-      const CHANNEL_NAME = "konferans_channel";
+        <!-- Duyuru butonları -->
+        <div class="row" style="margin-bottom:10px;">
+          <button class="btn btn-purple-h" id="publishTickerBtn" type="button">📢 Duyuruyu Yayınla</button>
+          <button class="btn btn-gray-h"   id="clearTickerBtn"   type="button">🗑 Duyuruyu Kaldır</button>
+        </div>
 
-      const defaultState = {
-        speaker: "",
-        symposium: "",
-        topic: "",
-        ticker: ""
-      };
+        <!-- Ana yayın butonları -->
+        <button class="btn btn-wide btn-green-h"  id="sendLiveBtn"  type="button">✅ CANLI YAYINA GÖNDER</button>
+        <button class="btn btn-wide btn-red-h"    id="removeAllBtn" type="button"
+                style="margin-top:8px;">✖ TÜMÜNÜ KALDIR</button>
 
-      const defaultLists = {
-        speakers: [],
-        symposiums: [],
-        topics: [],
-        announcements: []
-      };
+        <!-- Durum göstergesi + Tam Ekran -->
+        <div class="row" style="margin-top:14px;">
+          <span id="statusBadge" class="status-badge">⬤ Yayın kapalı</span>
+          <button class="btn btn-blue-h" id="fullscreenBtn" type="button"
+                  style="margin-left:auto;">⛶ Tam Ekran Yap</button>
+        </div>
+      </div><!-- /Yayın Yönetimi -->
 
-      const fieldMap = {
-        speakers: "speakerInput",
-        symposiums: "symposiumInput",
-        topics: "topicInput",
-        announcements: "tickerInput"
-      };
+      <!-- Kayıt Listeleri kartı -->
+      <div class="panel">
+        <h2>Kayıt Listeleri</h2>
+        <div class="lists-grid">
 
-      function readJson(key, fallback) {
-        try {
-          const raw = localStorage.getItem(key);
-          if (!raw) return fallback;
-          const parsed = JSON.parse(raw);
-          return { ...fallback, ...parsed };
-        } catch (_) {
-          return fallback;
-        }
-      }
+          <div class="list-card">
+            <div class="list-head">
+              <span>Konuşmacılar</span>
+              <button class="add-btn" data-list="speakers" type="button">+</button>
+            </div>
+            <div class="items" id="speakersList"></div>
+          </div>
 
-      let state = readJson(STORAGE_STATE_KEY, defaultState);
-      let lists = readJson(STORAGE_LISTS_KEY, defaultLists);
+          <div class="list-card">
+            <div class="list-head">
+              <span>Sempozyumlar</span>
+              <button class="add-btn" data-list="symposiums" type="button">+</button>
+            </div>
+            <div class="items" id="symposiumsList"></div>
+          </div>
 
-      const channel = "BroadcastChannel" in window ? new BroadcastChannel(CHANNEL_NAME) : null;
+          <div class="list-card">
+            <div class="list-head">
+              <span>Konular</span>
+              <button class="add-btn" data-list="topics" type="button">+</button>
+            </div>
+            <div class="items" id="topicsList"></div>
+          </div>
 
-      const speakerInput = document.getElementById("speakerInput");
-      const symposiumInput = document.getElementById("symposiumInput");
-      const topicInput = document.getElementById("topicInput");
-      const tickerInput = document.getElementById("tickerInput");
+          <div class="list-card">
+            <div class="list-head">
+              <span>Duyurular</span>
+              <button class="add-btn" data-list="announcements" type="button">+</button>
+            </div>
+            <div class="items" id="announcementsList"></div>
+          </div>
 
-      function saveState(nextState) {
-        state = { ...defaultState, ...nextState };
-        localStorage.setItem(STORAGE_STATE_KEY, JSON.stringify(state));
-        if (channel) {
-          channel.postMessage({ type: "state_update", payload: state });
-        }
-      }
+        </div><!-- /lists-grid -->
+      </div><!-- /Kayıt Listeleri -->
 
-      function saveLists() {
-        localStorage.setItem(STORAGE_LISTS_KEY, JSON.stringify(lists));
-      }
+    </div><!-- /col-left -->
 
-      function fillFormFromState() {
-        speakerInput.value = state.speaker || "";
-        symposiumInput.value = state.symposium || "";
-        topicInput.value = state.topic || "";
-        tickerInput.value = state.ticker || "";
-      }
+    <!-- ============================
+         SAĞ SÜTUN: Önizleme + Sayaç
+         ============================ -->
+    <div class="col-right">
 
-      function createItemElement(listName, value, index) {
-        const wrap = document.createElement("div");
-        wrap.className = "item";
+      <!-- Canlı Önizleme kartı -->
+      <div class="panel" id="previewPanel">
+        <h2>Canlı Önizleme</h2>
+        <div class="preview-wrapper" id="previewWrapper">
+          <iframe id="previewFrame" src="kursu.html" title="Kürsü önizlemesi"></iframe>
+        </div>
+      </div>
 
-        const text = document.createElement("div");
-        text.className = "item-text";
-        text.textContent = value;
-        wrap.appendChild(text);
+      <!-- Konuşma Süresi / Sayaç kartı (önizleme ile aynı genişlik: sağ sütun) -->
+      <div class="panel" id="timerPanel">
+        <h2>Konuşma Süresi / Sayaç</h2>
 
-        const actions = document.createElement("div");
-        actions.className = "item-actions";
+        <div id="timerDisplay" class="timer-display">00:00</div>
 
-        const selectBtn = document.createElement("button");
-        selectBtn.type = "button";
-        selectBtn.className = "btn-select";
-        selectBtn.textContent = "SEÇ";
-        selectBtn.addEventListener("click", function () {
-          const inputId = fieldMap[listName];
-          const target = document.getElementById(inputId);
-          target.value = value;
-        });
+        <div class="timer-row">
+          <label for="minuteInput" style="font-size:13px;font-weight:700;color:#2f3a4a;">Dakika:</label>
+          <input id="minuteInput" type="number" min="1" max="180" value="5" />
+          <button class="btn btn-green-h"  id="timerStartBtn"  type="button">▶ Başlat</button>
+          <button class="btn btn-orange-h" id="timerPauseBtn"  type="button">⏸ Duraklat</button>
+          <button class="btn btn-gray-h"   id="timerResetBtn"  type="button">↺ Sıfırla</button>
+        </div>
+      </div>
 
-        const deleteBtn = document.createElement("button");
-        deleteBtn.type = "button";
-        deleteBtn.className = "btn-delete";
-        deleteBtn.textContent = "SİL";
-        deleteBtn.addEventListener("click", function () {
-          lists[listName].splice(index, 1);
-          saveLists();
-          renderLists();
-        });
+    </div><!-- /col-right -->
 
-        actions.appendChild(selectBtn);
-        actions.appendChild(deleteBtn);
-        wrap.appendChild(actions);
-        return wrap;
-      }
+  </div><!-- /main-grid -->
+</main>
 
-      function renderList(listName) {
-        const container = document.getElementById(listName + "List");
-        container.innerHTML = "";
-        const items = lists[listName] || [];
+<!-- Toast bildirimi -->
+<div id="toast" class="toast"></div>
 
-        if (!items.length) {
-          const empty = document.createElement("div");
-          empty.className = "empty";
-          empty.textContent = "Kayıt yok";
-          container.appendChild(empty);
-          return;
-        }
+<script>
+(function () {
+  /* ===== Sabitler ===== */
+  var STORAGE_KEY   = "konferans_state";
+  var STORAGE_LISTS = "konferans_lists";
+  var CHANNEL_NAME  = "konferans_channel";
 
-        items.forEach(function (item, index) {
-          container.appendChild(createItemElement(listName, item, index));
-        });
-      }
+  var defaultState = { speaker: "", symposium: "", topic: "", ticker: "" };
+  var defaultLists = { speakers: [], symposiums: [], topics: [], announcements: [] };
 
-      function renderLists() {
-        renderList("speakers");
-        renderList("symposiums");
-        renderList("topics");
-        renderList("announcements");
-      }
+  /* Liste → input eşleşmesi */
+  var fieldMap = {
+    speakers:      "speakerInput",
+    symposiums:    "symposiumInput",
+    topics:        "topicInput",
+    announcements: "tickerInput"
+  };
 
-      function addListItem(listName) {
-        const value = (window.prompt("Yeni kayıt girin:") || "").trim();
-        if (!value) return;
-        lists[listName].push(value);
-        saveLists();
-        renderLists();
-      }
+  /* ===== Yardımcılar ===== */
+  function readJson(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      if (!raw) return Object.assign({}, fallback);
+      return Object.assign({}, fallback, JSON.parse(raw));
+    } catch (_) {
+      return Object.assign({}, fallback);
+    }
+  }
 
-      document.querySelectorAll(".add-btn").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          addListItem(btn.dataset.list);
-        });
-      });
+  /* ===== Durum & Listeler ===== */
+  var state = readJson(STORAGE_KEY, defaultState);
+  var lists = readJson(STORAGE_LISTS, defaultLists);
+  var channel = "BroadcastChannel" in window ? new BroadcastChannel(CHANNEL_NAME) : null;
 
-      document.getElementById("publishTickerBtn").addEventListener("click", function () {
-        saveState({
-          ...state,
-          ticker: tickerInput.value.trim()
-        });
-      });
+  /* DOM referansları */
+  var speakerInput   = document.getElementById("speakerInput");
+  var symposiumInput = document.getElementById("symposiumInput");
+  var topicInput     = document.getElementById("topicInput");
+  var tickerInput    = document.getElementById("tickerInput");
+  var statusBadge    = document.getElementById("statusBadge");
 
-      document.getElementById("clearTickerBtn").addEventListener("click", function () {
-        tickerInput.value = "";
-        saveState({
-          ...state,
-          ticker: ""
-        });
-      });
+  /* Durum kaydet + yayınla */
+  function saveState(next) {
+    state = Object.assign({}, defaultState, next);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    if (channel) channel.postMessage({ type: "state_update", payload: state });
+    updateStatusBadge();
+  }
 
-      document.getElementById("sendLiveBtn").addEventListener("click", function () {
-        saveState({
-          speaker: speakerInput.value.trim(),
-          symposium: symposiumInput.value.trim(),
-          topic: topicInput.value.trim(),
-          ticker: tickerInput.value.trim()
-        });
-      });
+  /* Formu mevcut state'ten doldur */
+  function fillForm() {
+    speakerInput.value   = state.speaker   || "";
+    symposiumInput.value = state.symposium || "";
+    topicInput.value     = state.topic     || "";
+    tickerInput.value    = state.ticker    || "";
+  }
 
-      window.addEventListener("storage", function (event) {
-        if (event.key !== STORAGE_STATE_KEY || !event.newValue) return;
-        try {
-          state = { ...defaultState, ...JSON.parse(event.newValue) };
-          fillFormFromState();
-        } catch (_) {}
-      });
+  /* Durum rozeti */
+  function updateStatusBadge() {
+    var live = !!(state.speaker || state.symposium || state.topic);
+    statusBadge.textContent = live ? "⬤ Canlı yayın aktif" : "⬤ Yayın kapalı";
+    statusBadge.className   = "status-badge" + (live ? " live" : "");
+  }
 
-      fillFormFromState();
+  /* Toast bildirimi */
+  var toastTimer;
+  function showToast(msg) {
+    var el = document.getElementById("toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove("show"); }, 2800);
+  }
+
+  /* ===== Buton olayları ===== */
+  document.getElementById("sendLiveBtn").addEventListener("click", function () {
+    saveState({
+      speaker:   speakerInput.value.trim(),
+      symposium: symposiumInput.value.trim(),
+      topic:     topicInput.value.trim(),
+      ticker:    tickerInput.value.trim()
+    });
+    showToast("✅ Canlı yayına gönderildi.");
+  });
+
+  document.getElementById("removeAllBtn").addEventListener("click", function () {
+    speakerInput.value = symposiumInput.value = topicInput.value = tickerInput.value = "";
+    saveState(Object.assign({}, defaultState));
+    showToast("✖ Tüm yayın kaldırıldı.");
+  });
+
+  document.getElementById("publishTickerBtn").addEventListener("click", function () {
+    saveState(Object.assign({}, state, { ticker: tickerInput.value.trim() }));
+    showToast("📢 Duyuru yayınlandı.");
+  });
+
+  document.getElementById("clearTickerBtn").addEventListener("click", function () {
+    tickerInput.value = "";
+    saveState(Object.assign({}, state, { ticker: "" }));
+    showToast("🗑 Duyuru kaldırıldı.");
+  });
+
+  /* Ctrl+Enter → Canlı Yayına Gönder */
+  document.addEventListener("keydown", function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+      document.getElementById("sendLiveBtn").click();
+    }
+  });
+
+  /* Tam Ekran */
+  document.getElementById("fullscreenBtn").addEventListener("click", function () {
+    var el = document.documentElement;
+    if (el.requestFullscreen)            el.requestFullscreen();
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    else if (el.mozRequestFullScreen)    el.mozRequestFullScreen();
+  });
+
+  /* Storage senkronu */
+  window.addEventListener("storage", function (e) {
+    if (e.key !== STORAGE_KEY || !e.newValue) return;
+    try {
+      state = Object.assign({}, defaultState, JSON.parse(e.newValue));
+      fillForm();
+      updateStatusBadge();
+    } catch (_) {}
+  });
+
+  /* ===== CANLI ÖNİZLEME ÖLÇEKLEME =====
+     iframe 1280×720 → wrapper gerçek px genişliğine orantılı scale */
+  function scalePreview() {
+    var wrapper = document.getElementById("previewWrapper");
+    var frame   = document.getElementById("previewFrame");
+    var w = wrapper.clientWidth;
+    var scale = w / 1280;
+    frame.style.transform = "scale(" + scale + ")";
+    /* wrapper yüksekliği 16:9 (padding-bottom:%56.25) ile ayarlı */
+  }
+
+  /* Pencere boyutu değişince scale'i güncelle */
+  window.addEventListener("resize", scalePreview);
+  document.getElementById("previewFrame").addEventListener("load", scalePreview);
+  scalePreview();
+
+  /* ===== KAYIT LİSTELERİ ===== */
+  function saveLists() {
+    localStorage.setItem(STORAGE_LISTS, JSON.stringify(lists));
+  }
+
+  function createItem(listName, value, index) {
+    var wrap    = document.createElement("div");
+    wrap.className = "item";
+
+    var text = document.createElement("div");
+    text.className   = "item-text";
+    text.textContent = value;
+    wrap.appendChild(text);
+
+    var actions = document.createElement("div");
+    actions.className = "item-actions";
+
+    var selBtn = document.createElement("button");
+    selBtn.type      = "button";
+    selBtn.className = "btn-select";
+    selBtn.textContent = "SEÇ";
+    selBtn.addEventListener("click", function () {
+      var inp = document.getElementById(fieldMap[listName]);
+      if (inp) inp.value = value;
+    });
+
+    var delBtn = document.createElement("button");
+    delBtn.type      = "button";
+    delBtn.className = "btn-delete";
+    delBtn.textContent = "SİL";
+    delBtn.addEventListener("click", function () {
+      lists[listName].splice(index, 1);
+      saveLists();
       renderLists();
-    })();
-  </script>
+    });
+
+    actions.appendChild(selBtn);
+    actions.appendChild(delBtn);
+    wrap.appendChild(actions);
+    return wrap;
+  }
+
+  function renderList(name) {
+    var container = document.getElementById(name + "List");
+    if (!container) return;
+    container.innerHTML = "";
+    var items = lists[name] || [];
+    if (!items.length) {
+      var empty = document.createElement("div");
+      empty.className   = "empty";
+      empty.textContent = "Kayıt yok";
+      container.appendChild(empty);
+      return;
+    }
+    items.forEach(function (val, i) {
+      container.appendChild(createItem(name, val, i));
+    });
+  }
+
+  function renderLists() {
+    renderList("speakers");
+    renderList("symposiums");
+    renderList("topics");
+    renderList("announcements");
+  }
+
+  document.querySelectorAll(".add-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var val = (window.prompt("Yeni kayıt girin:") || "").trim();
+      if (!val) return;
+      var name = btn.dataset.list;
+      lists[name].push(val);
+      saveLists();
+      renderLists();
+    });
+  });
+
+  /* ===== SAYAÇ ===== */
+  var timerInterval = null;
+  var timerSeconds  = 0;
+  var timerRunning  = false;
+
+  var timerDisplay  = document.getElementById("timerDisplay");
+  var minuteInput   = document.getElementById("minuteInput");
+  var startBtn      = document.getElementById("timerStartBtn");
+  var pauseBtn      = document.getElementById("timerPauseBtn");
+  var resetBtn      = document.getElementById("timerResetBtn");
+
+  function pad(n) { return n < 10 ? "0" + n : "" + n; }
+
+  function updateTimerDisplay() {
+    var m = Math.floor(timerSeconds / 60);
+    var s = timerSeconds % 60;
+    timerDisplay.textContent = pad(m) + ":" + pad(s);
+
+    /* Renk / durum güncelle */
+    timerDisplay.classList.remove("warn", "danger", "over", "blink");
+
+    if (timerSeconds <= 0) {
+      timerDisplay.textContent = "SÜRE DOLDU";
+      timerDisplay.classList.add("over", "blink");
+    } else if (timerSeconds <= 60) {
+      timerDisplay.classList.add("danger"); /* Son 1 dakika: kırmızı */
+    } else if (timerSeconds <= 180) {
+      timerDisplay.classList.add("warn");   /* Son 3 dakika: sarı */
+    }
+  }
+
+  function timerTick() {
+    if (timerSeconds > 0) {
+      timerSeconds--;
+      updateTimerDisplay();
+    } else {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      timerRunning  = false;
+    }
+  }
+
+  startBtn.addEventListener("click", function () {
+    if (timerRunning) return;
+    if (timerSeconds <= 0) {
+      /* Yeni başlatma */
+      var mins = parseInt(minuteInput.value, 10) || 5;
+      timerSeconds = mins * 60;
+    }
+    timerRunning = true;
+    timerInterval = setInterval(timerTick, 1000);
+    updateTimerDisplay();
+  });
+
+  pauseBtn.addEventListener("click", function () {
+    if (!timerRunning) return;
+    clearInterval(timerInterval);
+    timerInterval = null;
+    timerRunning  = false;
+  });
+
+  resetBtn.addEventListener("click", function () {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    timerRunning  = false;
+    timerSeconds  = 0;
+    timerDisplay.textContent = "00:00";
+    timerDisplay.classList.remove("warn", "danger", "over", "blink");
+  });
+
+  /* ===== İlk yükleme ===== */
+  fillForm();
+  updateStatusBadge();
+  renderLists();
+})();
+</script>
 </body>
 </html>
