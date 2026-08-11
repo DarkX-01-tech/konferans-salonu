@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Konferans Salonu - Kürsü Ekranı</title>
+  <style>
+    :root {
+      --red: #cc2029;
+      --text: #1b2736;
+      --muted: #4c5b6c;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      color: var(--text);
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      padding: 24px 30px 16px;
+      border-bottom: 1px solid #ebedf2;
+    }
+
+    .logo {
+      width: 110px;
+      height: 110px;
+      object-fit: contain;
+      flex: 0 0 auto;
+    }
+
+    .titles {
+      line-height: 1.3;
+    }
+
+    .titles .line1 {
+      font-size: clamp(22px, 2.4vw, 42px);
+      font-weight: 800;
+      letter-spacing: .4px;
+    }
+
+    .titles .line2,
+    .titles .line3 {
+      font-size: clamp(18px, 1.7vw, 30px);
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .center {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px 32px;
+    }
+
+    .content {
+      max-width: 95vw;
+    }
+
+    .topic {
+      margin: 0 0 24px;
+      font-size: clamp(36px, 5vw, 90px);
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #24364f;
+    }
+
+    .speaker {
+      margin: 0;
+      font-size: clamp(34px, 7vw, 108px);
+      font-weight: 900;
+      color: #161f2c;
+      text-transform: uppercase;
+    }
+
+    .bottom {
+      background: var(--red);
+      color: #fff;
+      height: 86px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      border-top: 4px solid #b11622;
+    }
+
+    .marquee {
+      display: inline-block;
+      white-space: nowrap;
+      transform: translateX(100vw);
+      animation: ticker 22s linear infinite;
+      font-size: clamp(22px, 2vw, 34px);
+      font-weight: 700;
+    }
+
+    @keyframes ticker {
+      0% { transform: translateX(100vw); }
+      100% { transform: translateX(-100%); }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <img id="logo" class="logo" src="logo.png" alt="Logo" onerror="this.style.display='none'" />
+    <div class="titles">
+      <div class="line1">T.C. SAĞLIK BAKANLIĞI</div>
+      <div class="line2">İSTANBUL İL SAĞLIK MÜDÜRLÜĞÜ</div>
+      <div class="line3">Marmara Üniversitesi Pendik Eğitim ve Araştırma Hastanesi</div>
+    </div>
+  </header>
+
+  <main class="center">
+    <div class="content">
+      <h1 id="topic" class="topic"></h1>
+      <h2 id="speaker" class="speaker"></h2>
+    </div>
+  </main>
+
+  <footer class="bottom">
+    <div id="marquee" class="marquee"></div>
+  </footer>
+
+  <script>
+    (function () {
+      const STORAGE_STATE_KEY = "konferans_state";
+      const CHANNEL_NAME = "konferans_channel";
+
+      const defaultState = {
+        speaker: "",
+        symposium: "",
+        topic: "",
+        ticker: ""
+      };
+
+      const topicEl = document.getElementById("topic");
+      const speakerEl = document.getElementById("speaker");
+      const marqueeEl = document.getElementById("marquee");
+
+      function readState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_STATE_KEY);
+          if (!raw) return { ...defaultState };
+          return { ...defaultState, ...JSON.parse(raw) };
+        } catch (_) {
+          return { ...defaultState };
+        }
+      }
+
+      function render(state) {
+        topicEl.textContent = state.topic || "";
+        speakerEl.textContent = state.speaker || "";
+
+        const barText = [state.symposium, state.ticker].filter(Boolean).join(" / ");
+        marqueeEl.textContent = barText || "";
+        marqueeEl.style.animation = "none";
+        void marqueeEl.offsetWidth;
+        marqueeEl.style.animation = "";
+      }
+
+      render(readState());
+
+      if ("BroadcastChannel" in window) {
+        const channel = new BroadcastChannel(CHANNEL_NAME);
+        channel.addEventListener("message", function (event) {
+          if (!event.data || event.data.type !== "state_update") return;
+          render({ ...defaultState, ...event.data.payload });
+        });
+      }
+
+      window.addEventListener("storage", function (event) {
+        if (event.key !== STORAGE_STATE_KEY) return;
+        render(readState());
+      });
+    })();
+  </script>
+</body>
+</html>
