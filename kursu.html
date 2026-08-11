@@ -6,128 +6,457 @@
   <title>Konferans Salonu - Kürsü Ekranı</title>
   <style>
     :root {
-      --red: #cc2029;
-      --text: #1b2736;
-      --muted: #4c5b6c;
+      --bg-1: #0d1117;
+      --bg-2: #131c2e;
+      --bg-3: #0a0f1a;
+      --surface: rgba(255, 255, 255, 0.04);
+      --surface-border: rgba(255, 255, 255, 0.09);
+      --accent-red: #e11d2a;
+      --accent-red-soft: #ff2d3a;
+      --speaker-color: #ffffff;
+      --topic-color: #ff2d3a;
+      --muted-text: rgba(227, 232, 243, 0.78);
+      --soft-text: rgba(227, 232, 243, 0.56);
+      --ticker-start: #b11622;
+      --ticker-end: #e11d2a;
+      --speaker-size: clamp(52px, 8.5vw, 130px);
+      --topic-size: clamp(26px, 3.2vw, 58px);
+      --header-padding-x: clamp(28px, 4vw, 72px);
+      --content-padding-top: clamp(34px, 5vw, 80px);
+      --content-width: min(72vw, 1320px);
     }
 
     * { box-sizing: border-box; }
-    body {
+
+    html, body {
       margin: 0;
-      min-height: 100vh;
+      min-height: 100%;
       font-family: Arial, sans-serif;
-      color: var(--text);
-      background: #fff;
+      color: var(--speaker-color);
+      background:
+        radial-gradient(circle at 12% 18%, rgba(225, 29, 42, 0.18), transparent 28%),
+        radial-gradient(circle at 84% 16%, rgba(56, 91, 173, 0.18), transparent 24%),
+        linear-gradient(145deg, var(--bg-1) 0%, var(--bg-2) 48%, var(--bg-3) 100%);
+    }
+
+    body {
+      position: relative;
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    body::before {
+      background:
+        radial-gradient(circle at center, transparent 42%, rgba(3, 7, 13, 0.22) 100%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 22%);
+    }
+
+    body::after {
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0, rgba(255, 255, 255, 0) 18%, rgba(255, 255, 255, 0.025) 100%);
+      opacity: 0.45;
+      mix-blend-mode: screen;
+    }
+
+    .screen {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
 
     .header {
       display: flex;
-      align-items: center;
-      gap: 22px;
-      padding: 24px 30px 16px;
-      border-bottom: 1px solid #ebedf2;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      padding: 24px var(--header-padding-x) 0;
     }
 
-    .logo {
-      width: 110px;
-      height: 110px;
-      object-fit: contain;
-      flex: 0 0 auto;
+    .brand {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      min-height: 112px;
     }
 
-    .titles {
-      line-height: 1.3;
-    }
-
-    .titles .line1 {
-      font-size: clamp(22px, 2.4vw, 42px);
-      font-weight: 800;
-      letter-spacing: .4px;
-    }
-
-    .titles .line2,
-    .titles .line3 {
-      font-size: clamp(18px, 1.7vw, 30px);
-      color: var(--muted);
-      font-weight: 700;
-    }
-
-    .center {
-      flex: 1;
+    .logo-shell {
+      min-width: 120px;
+      min-height: 120px;
       display: flex;
       align-items: center;
       justify-content: center;
-      text-align: center;
-      padding: 24px 32px;
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.22);
+      padding: 10px 14px;
+      backdrop-filter: blur(10px);
     }
 
-    .content {
-      max-width: 95vw;
+    .logo-shell.is-fallback {
+      display: none;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      padding: 0;
+      min-width: auto;
+      min-height: auto;
+    }
+
+    .logo {
+      display: block;
+      max-width: 100%;
+      max-height: 96px;
+      object-fit: contain;
+    }
+
+    .brand-fallback {
+      display: none;
+      line-height: 1.15;
+      text-transform: uppercase;
+    }
+
+    .brand-fallback strong {
+      display: block;
+      font-size: clamp(18px, 1.45vw, 26px);
+      color: var(--speaker-color);
+      letter-spacing: 0.1em;
+    }
+
+    .brand-fallback span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted-text);
+      font-size: clamp(14px, 1.15vw, 22px);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .header-tools {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .clock-panel {
+      min-width: 220px;
+      padding: 12px 18px;
+      border-radius: 20px;
+      background: rgba(7, 12, 22, 0.36);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(16px);
+      text-align: right;
+    }
+
+    .clock-time {
+      font-size: clamp(26px, 2.25vw, 42px);
+      font-weight: 300;
+      letter-spacing: 0.1em;
+      color: var(--speaker-color);
+    }
+
+    .clock-date {
+      margin-top: 4px;
+      font-size: clamp(14px, 1vw, 18px);
+      color: var(--muted-text);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .fullscreen-btn {
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      border-radius: 16px;
+      padding: 11px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--muted-text);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 180ms ease, background 180ms ease, color 180ms ease;
+      backdrop-filter: blur(12px);
+    }
+
+    .fullscreen-btn:hover,
+    .fullscreen-btn:focus-visible {
+      outline: none;
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--speaker-color);
+    }
+
+    .stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      padding: var(--content-padding-top) var(--header-padding-x) 0;
+    }
+
+    .stage-copy,
+    .idle-copy {
+      width: var(--content-width);
+      max-width: 100%;
+      opacity: 0;
+      transform: translate3d(0, 28px, 0);
+      transition: opacity 420ms ease, transform 420ms ease;
+      will-change: opacity, transform;
+    }
+
+    .stage-copy.is-visible,
+    .idle-copy.is-visible {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
     }
 
     .topic {
-      margin: 0 0 24px;
-      font-size: clamp(36px, 5vw, 90px);
-      font-weight: 800;
+      margin: 0;
+      color: var(--topic-color);
       text-transform: uppercase;
-      color: #24364f;
+      font-size: var(--topic-size);
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      line-height: 1.2;
+      max-width: 100%;
+      text-shadow: 0 0 24px rgba(255, 45, 58, 0.16);
+      overflow-wrap: anywhere;
+    }
+
+    .accent-line {
+      width: clamp(96px, 10vw, 180px);
+      height: 5px;
+      margin: 22px 0 34px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent-red), var(--accent-red-soft));
+      box-shadow: 0 0 18px rgba(225, 29, 42, 0.28);
     }
 
     .speaker {
       margin: 0;
-      font-size: clamp(34px, 7vw, 108px);
+      color: var(--speaker-color);
+      text-transform: uppercase;
+      font-size: var(--speaker-size);
       font-weight: 900;
-      color: #161f2c;
+      line-height: 1.04;
+      letter-spacing: 0.045em;
+      text-shadow: 0 10px 34px rgba(0, 0, 0, 0.42), 0 0 26px rgba(255, 255, 255, 0.08);
+      overflow-wrap: anywhere;
+    }
+
+    .speaker-bar {
+      width: clamp(150px, 16vw, 290px);
+      height: 4px;
+      margin-top: 26px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(225, 29, 42, 0.96), rgba(225, 29, 42, 0.15));
+    }
+
+    .idle-copy {
+      display: none;
+      padding-top: 18px;
+    }
+
+    .idle-copy.is-visible {
+      display: block;
+      animation: idlePulse 2.8s ease-in-out infinite;
+    }
+
+    .idle-title {
+      margin: 0;
+      font-size: clamp(30px, 4.4vw, 76px);
+      color: rgba(255, 255, 255, 0.88);
+      font-weight: 800;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
-    .bottom {
-      background: var(--red);
-      color: #fff;
-      height: 86px;
-      display: flex;
-      align-items: center;
+    .idle-subtitle {
+      margin: 18px 0 0;
+      max-width: min(68ch, 100%);
+      color: var(--soft-text);
+      font-size: clamp(18px, 1.5vw, 28px);
+      line-height: 1.5;
+      letter-spacing: 0.03em;
+    }
+
+    @keyframes idlePulse {
+      0%, 100% { opacity: 0.64; }
+      50% { opacity: 1; }
+    }
+
+    .ticker {
+      position: relative;
+      min-height: 94px;
+      margin-top: 36px;
       overflow: hidden;
-      border-top: 4px solid #b11622;
+      background: linear-gradient(90deg, var(--ticker-start), var(--ticker-end));
+      box-shadow: 0 -10px 28px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      transition: opacity 240ms ease, transform 240ms ease, min-height 240ms ease;
     }
 
-    .marquee {
-      display: inline-block;
+    .ticker::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.15), transparent 26%, transparent 74%, rgba(0, 0, 0, 0.14));
+      pointer-events: none;
+    }
+
+    .ticker.is-hidden {
+      min-height: 0;
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    .ticker-track {
+      display: inline-flex;
+      align-items: center;
+      gap: 64px;
+      min-width: 100%;
+      padding: 30px 0;
       white-space: nowrap;
-      transform: translateX(100vw);
-      animation: ticker 22s linear infinite;
-      font-size: clamp(22px, 2vw, 34px);
-      font-weight: 700;
+      animation: marquee 28s linear infinite;
+      will-change: transform;
     }
 
-    @keyframes ticker {
-      0% { transform: translateX(100vw); }
-      100% { transform: translateX(-100%); }
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 18px;
+      padding-left: 32px;
+      font-size: clamp(22px, 1.75vw, 34px);
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      color: #ffffff;
+      text-transform: uppercase;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+    }
+
+    .ticker-item::before {
+      content: "";
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.34);
+      flex: 0 0 auto;
+    }
+
+    @keyframes marquee {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-50%, 0, 0); }
+    }
+
+    @media (max-width: 1080px) {
+      .header {
+        flex-direction: column;
+      }
+
+      .header-tools {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .stage {
+        padding-top: 28px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      :root {
+        --content-width: 100%;
+      }
+
+      .header {
+        padding-right: 20px;
+        padding-left: 20px;
+      }
+
+      .stage {
+        padding-right: 20px;
+        padding-left: 20px;
+      }
+
+      .brand {
+        gap: 14px;
+      }
+
+      .logo-shell {
+        min-width: 96px;
+        min-height: 96px;
+      }
+
+      .clock-panel {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .ticker-track {
+        gap: 44px;
+      }
     }
   </style>
 </head>
 <body>
-  <header class="header">
-    <img id="logo" class="logo" src="logo.png" alt="Logo" onerror="this.style.display='none'" />
-    <div class="titles">
-      <div class="line1">T.C. SAĞLIK BAKANLIĞI</div>
-      <div class="line2">İSTANBUL İL SAĞLIK MÜDÜRLÜĞÜ</div>
-      <div class="line3">Marmara Üniversitesi Pendik Eğitim ve Araştırma Hastanesi</div>
-    </div>
-  </header>
+  <div class="screen">
+    <header class="header">
+      <div class="brand">
+        <div class="logo-shell" id="logoShell">
+          <img id="logo" class="logo" src="img/hastane.png" alt="Marmara Üniversitesi Pendik Eğitim ve Araştırma Hastanesi logosu" />
+        </div>
+        <div id="brandFallback" class="brand-fallback" aria-live="polite">
+          <strong>T.C. Sağlık Bakanlığı</strong>
+          <span>İstanbul İl Sağlık Müdürlüğü</span>
+          <span>Marmara Üniversitesi Pendik Eğitim ve Araştırma Hastanesi</span>
+        </div>
+      </div>
 
-  <main class="center">
-    <div class="content">
-      <h1 id="topic" class="topic"></h1>
-      <h2 id="speaker" class="speaker"></h2>
-    </div>
-  </main>
+      <div class="header-tools">
+        <div class="clock-panel" aria-live="polite">
+          <div id="clockTime" class="clock-time">00:00:00</div>
+          <div id="clockDate" class="clock-date">11 Ağustos 2026</div>
+        </div>
+        <button id="fullscreenBtn" class="fullscreen-btn" type="button">Tam Ekran</button>
+      </div>
+    </header>
 
-  <footer class="bottom">
-    <div id="marquee" class="marquee"></div>
-  </footer>
+    <main class="stage">
+      <section id="stageCopy" class="stage-copy" aria-live="polite">
+        <p id="topic" class="topic"></p>
+        <div id="accentLine" class="accent-line" aria-hidden="true"></div>
+        <h1 id="speaker" class="speaker"></h1>
+        <div id="speakerBar" class="speaker-bar" aria-hidden="true"></div>
+      </section>
+
+      <section id="idleCopy" class="idle-copy" aria-live="polite">
+        <h1 class="idle-title">Yayın bekleniyor</h1>
+        <p class="idle-subtitle">Konuşmacı ve konu bilgisi yönetim panelinden gönderildiğinde bu alan otomatik olarak güncellenecektir.</p>
+      </section>
+    </main>
+
+    <footer id="ticker" class="ticker is-hidden">
+      <div id="tickerTrack" class="ticker-track">
+        <span id="tickerPrimary" class="ticker-item"></span>
+        <span id="tickerSecondary" class="ticker-item" aria-hidden="true"></span>
+      </div>
+    </footer>
+  </div>
 
   <script>
     (function () {
@@ -143,43 +472,174 @@
 
       const topicEl = document.getElementById("topic");
       const speakerEl = document.getElementById("speaker");
-      const marqueeEl = document.getElementById("marquee");
+      const accentLineEl = document.getElementById("accentLine");
+      const speakerBarEl = document.getElementById("speakerBar");
+      const stageCopyEl = document.getElementById("stageCopy");
+      const idleCopyEl = document.getElementById("idleCopy");
+      const tickerEl = document.getElementById("ticker");
+      const tickerTrackEl = document.getElementById("tickerTrack");
+      const tickerPrimaryEl = document.getElementById("tickerPrimary");
+      const tickerSecondaryEl = document.getElementById("tickerSecondary");
+      const clockTimeEl = document.getElementById("clockTime");
+      const clockDateEl = document.getElementById("clockDate");
+      const fullscreenBtnEl = document.getElementById("fullscreenBtn");
+      const logoEl = document.getElementById("logo");
+      const logoShellEl = document.getElementById("logoShell");
+      const brandFallbackEl = document.getElementById("brandFallback");
+
+      let currentState = { ...defaultState };
+      let transitionTimer = null;
+
+      function normalizeState(rawState) {
+        return {
+          speaker: String(rawState && rawState.speaker ? rawState.speaker : "").trim(),
+          symposium: String(rawState && rawState.symposium ? rawState.symposium : "").trim(),
+          topic: String(rawState && rawState.topic ? rawState.topic : "").trim(),
+          ticker: String(rawState && rawState.ticker ? rawState.ticker : "").trim()
+        };
+      }
 
       function readState() {
         try {
           const raw = localStorage.getItem(STORAGE_STATE_KEY);
           if (!raw) return { ...defaultState };
-          return { ...defaultState, ...JSON.parse(raw) };
+          return normalizeState({ ...defaultState, ...JSON.parse(raw) });
         } catch (_) {
           return { ...defaultState };
         }
       }
 
-      function render(state) {
-        topicEl.textContent = state.topic || "";
-        speakerEl.textContent = state.speaker || "";
-
-        const barText = [state.symposium, state.ticker].filter(Boolean).join(" / ");
-        marqueeEl.textContent = barText || "";
-        marqueeEl.style.animation = "none";
-        void marqueeEl.offsetWidth;
-        marqueeEl.style.animation = "";
+      function isIdle(state) {
+        return !state.topic && !state.speaker;
       }
 
-      render(readState());
+      function fitText(element, options) {
+        const min = options.min;
+        const max = options.max;
+        let fontSize = Math.min(max, Math.max(min, Math.round(window.innerWidth * options.ratio)));
+
+        element.style.fontSize = fontSize + "px";
+
+        while (fontSize > min && (element.scrollWidth > element.clientWidth || element.scrollHeight > element.clientHeight)) {
+          fontSize -= 2;
+          element.style.fontSize = fontSize + "px";
+        }
+      }
+
+      function fitStageText() {
+        if (isIdle(currentState)) return;
+        fitText(topicEl, { min: 26, max: 58, ratio: 0.032 });
+        fitText(speakerEl, { min: 52, max: 130, ratio: 0.085 });
+      }
+
+      function updateTicker(state) {
+        const tickerText = [state.symposium, state.ticker].filter(Boolean).join("  •  ");
+        const hasTicker = Boolean(tickerText);
+
+        tickerEl.classList.toggle("is-hidden", !hasTicker);
+        tickerPrimaryEl.textContent = tickerText;
+        tickerSecondaryEl.textContent = tickerText;
+
+        tickerTrackEl.style.animation = "none";
+        void tickerTrackEl.offsetWidth;
+        tickerTrackEl.style.animation = "";
+      }
+
+      function updateContent(state) {
+        topicEl.textContent = state.topic;
+        speakerEl.textContent = state.speaker;
+        topicEl.style.display = state.topic ? "block" : "none";
+        accentLineEl.style.display = state.topic ? "block" : "none";
+        speakerBarEl.style.display = state.speaker ? "block" : "none";
+        updateTicker(state);
+        currentState = state;
+
+        requestAnimationFrame(function () {
+          fitStageText();
+        });
+      }
+
+      function setVisibleState(state) {
+        const idle = isIdle(state);
+        stageCopyEl.classList.toggle("is-visible", !idle);
+        idleCopyEl.classList.toggle("is-visible", idle);
+      }
+
+      function renderState(nextState, animate) {
+        const normalizedState = normalizeState(nextState);
+
+        if (!animate) {
+          updateContent(normalizedState);
+          setVisibleState(normalizedState);
+          return;
+        }
+
+        clearTimeout(transitionTimer);
+        stageCopyEl.classList.remove("is-visible");
+        idleCopyEl.classList.remove("is-visible");
+
+        transitionTimer = window.setTimeout(function () {
+          updateContent(normalizedState);
+          setVisibleState(normalizedState);
+        }, 210);
+      }
+
+      function updateClock() {
+        const now = new Date();
+        clockTimeEl.textContent = now.toLocaleTimeString("tr-TR", { hour12: false });
+        clockDateEl.textContent = now.toLocaleDateString("tr-TR", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric"
+        });
+      }
+
+      function syncFullscreenButton() {
+        fullscreenBtnEl.textContent = document.fullscreenElement ? "Tam Ekrandan Çık" : "Tam Ekran";
+      }
+
+      function toggleFullscreen() {
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(function () {});
+          return;
+        }
+
+        const target = document.documentElement;
+        if (target.requestFullscreen) {
+          target.requestFullscreen().catch(function () {});
+        }
+      }
+
+      function showFallbackBrand() {
+        logoEl.style.display = "none";
+        logoShellEl.classList.add("is-fallback");
+        brandFallbackEl.style.display = "block";
+      }
+
+      logoEl.addEventListener("error", showFallbackBrand);
+      fullscreenBtnEl.addEventListener("click", toggleFullscreen);
+      document.addEventListener("fullscreenchange", syncFullscreenButton);
+      window.addEventListener("resize", function () {
+        requestAnimationFrame(fitStageText);
+      });
 
       if ("BroadcastChannel" in window) {
         const channel = new BroadcastChannel(CHANNEL_NAME);
         channel.addEventListener("message", function (event) {
           if (!event.data || event.data.type !== "state_update") return;
-          render({ ...defaultState, ...event.data.payload });
+          renderState({ ...defaultState, ...event.data.payload }, true);
         });
       }
 
       window.addEventListener("storage", function (event) {
         if (event.key !== STORAGE_STATE_KEY) return;
-        render(readState());
+        renderState(readState(), true);
       });
+
+      updateClock();
+      window.setInterval(updateClock, 1000);
+      syncFullscreenButton();
+      renderState(readState(), false);
     })();
   </script>
 </body>

@@ -6,63 +6,133 @@
   <title>Konferans Salonu - Yönetici</title>
   <style>
     :root {
-      --bg: #f4f6fb;
+      --bg: #eef2f9;
       --card: #ffffff;
-      --border: #dfe5ef;
-      --text: #1f2d3d;
-      --muted: #637083;
+      --border: #d9e1ee;
+      --text: #162131;
+      --muted: #66758a;
       --green: #17a34a;
       --purple: #7d4cff;
-      --gray: #7f8a9b;
+      --gray: #738195;
       --orange: #f09b1a;
       --red: #d94141;
       --blue: #2c7be5;
+      --stage-bg-1: #0d1117;
+      --stage-bg-2: #131c2e;
+      --stage-bg-3: #0a0f1a;
+      --stage-accent: #e11d2a;
+      --stage-speaker: #ffffff;
+      --stage-muted: rgba(227, 232, 243, 0.76);
+      --stage-soft: rgba(227, 232, 243, 0.55);
     }
 
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: var(--bg);
+      background:
+        radial-gradient(circle at top left, rgba(44, 123, 229, 0.08), transparent 22%),
+        linear-gradient(180deg, #f8fafe 0%, var(--bg) 100%);
       color: var(--text);
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1380px;
       margin: 24px auto;
-      padding: 0 16px 24px;
+      padding: 0 16px 32px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel,
+    .list-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 10px 24px rgba(20, 32, 62, 0.07);
     }
 
     .panel {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 18px;
-      box-shadow: 0 6px 16px rgba(20, 32, 62, 0.06);
+      padding: 22px;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 18px;
     }
 
     h1 {
-      margin: 0 0 16px;
-      font-size: 28px;
+      margin: 0;
+      font-size: 30px;
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .status-chip {
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #0e4f29;
+      background: rgba(23, 163, 74, 0.14);
+      border: 1px solid rgba(23, 163, 74, 0.18);
+      white-space: nowrap;
+    }
+
+    .status-chip.is-draft {
+      color: #6b4ce0;
+      background: rgba(125, 76, 255, 0.12);
+      border-color: rgba(125, 76, 255, 0.16);
+    }
+
+    .status-chip.is-idle {
+      color: #627083;
+      background: rgba(115, 129, 149, 0.12);
+      border-color: rgba(115, 129, 149, 0.16);
     }
 
     .field {
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
 
     .field label {
       display: block;
       margin-bottom: 6px;
       font-weight: 700;
-      color: #2f3a4a;
+      color: #233245;
     }
 
     .field input {
       width: 100%;
-      padding: 11px 12px;
-      border-radius: 8px;
-      border: 1px solid #c9d2e1;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid #c8d2e3;
       font-size: 16px;
+      color: var(--text);
+      background: #fbfcff;
+      transition: border-color 140ms ease, box-shadow 140ms ease;
+    }
+
+    .field input:focus {
+      outline: none;
+      border-color: rgba(44, 123, 229, 0.52);
+      box-shadow: 0 0 0 4px rgba(44, 123, 229, 0.12);
     }
 
     .row {
@@ -74,12 +144,20 @@
 
     button {
       border: 0;
-      border-radius: 8px;
-      padding: 10px 14px;
+      border-radius: 12px;
+      padding: 11px 16px;
       font-size: 14px;
       font-weight: 700;
       color: #fff;
       cursor: pointer;
+      transition: transform 140ms ease, filter 140ms ease;
+    }
+
+    button:hover,
+    button:focus-visible {
+      transform: translateY(-1px);
+      filter: brightness(1.02);
+      outline: none;
     }
 
     .btn-purple { background: var(--purple); }
@@ -87,24 +165,251 @@
     .btn-green {
       background: var(--green);
       width: 100%;
-      margin-top: 14px;
-      padding: 14px;
+      margin-top: 16px;
+      padding: 15px;
       font-size: 18px;
-      border-radius: 10px;
+      border-radius: 14px;
+    }
+
+    .preview-card {
+      padding: 18px;
+    }
+
+    .preview-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .preview-head h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .preview-note {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .preview-stage {
+      position: relative;
+      min-height: 480px;
+      border-radius: 22px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(225, 29, 42, 0.2), transparent 28%),
+        radial-gradient(circle at 84% 16%, rgba(56, 91, 173, 0.22), transparent 24%),
+        linear-gradient(145deg, var(--stage-bg-1) 0%, var(--stage-bg-2) 48%, var(--stage-bg-3) 100%);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 24px 48px rgba(9, 12, 19, 0.18);
+      color: var(--stage-speaker);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .preview-stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at center, transparent 44%, rgba(3, 7, 13, 0.24) 100%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 18%);
+      pointer-events: none;
+    }
+
+    .preview-stage > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 18px 20px 0;
+    }
+
+    .preview-brand {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      min-height: 68px;
+    }
+
+    .preview-logo-shell {
+      min-width: 84px;
+      min-height: 84px;
+      border-radius: 18px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .preview-logo-shell.is-fallback {
+      display: none;
+    }
+
+    .preview-logo {
+      display: block;
+      max-width: 100%;
+      max-height: 62px;
+      object-fit: contain;
+    }
+
+    .preview-brand-fallback {
+      display: none;
+      font-size: 10px;
+      line-height: 1.3;
+      text-transform: uppercase;
+      color: var(--stage-muted);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .preview-brand-fallback strong {
+      display: block;
+      color: var(--stage-speaker);
+      font-size: 11px;
+      margin-bottom: 2px;
+    }
+
+    .preview-clock {
+      text-align: right;
+      color: var(--stage-muted);
+    }
+
+    .preview-clock-time {
+      font-size: 20px;
+      font-weight: 300;
+      letter-spacing: 0.08em;
+      color: var(--stage-speaker);
+    }
+
+    .preview-clock-date {
+      margin-top: 3px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .preview-copy {
+      flex: 1;
+      padding: 28px 20px 0;
+    }
+
+    .preview-topic {
+      margin: 0;
+      color: var(--stage-accent);
+      font-size: clamp(20px, 2.2vw, 34px);
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+
+    .preview-line {
+      width: 92px;
+      height: 4px;
+      margin: 14px 0 20px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--stage-accent), #ff4855);
+    }
+
+    .preview-speaker {
+      margin: 0;
+      color: var(--stage-speaker);
+      font-size: clamp(34px, 4vw, 58px);
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      line-height: 1.04;
+      text-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      overflow-wrap: anywhere;
+    }
+
+    .preview-speaker-bar {
+      width: 140px;
+      height: 4px;
+      margin-top: 18px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(225, 29, 42, 0.95), rgba(225, 29, 42, 0.14));
+    }
+
+    .preview-idle {
+      display: none;
+      padding-top: 18px;
+      color: var(--stage-soft);
+      animation: previewPulse 2.6s ease-in-out infinite;
+    }
+
+    .preview-idle.is-visible {
+      display: block;
+    }
+
+    .preview-idle strong {
+      display: block;
+      font-size: 28px;
+      color: var(--stage-speaker);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+    }
+
+    .preview-idle span {
+      display: block;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    @keyframes previewPulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    .preview-ticker {
+      min-height: 72px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      background: linear-gradient(90deg, #b11622, #e11d2a);
+      color: #fff;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-size: 14px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      transition: opacity 180ms ease, transform 180ms ease, min-height 180ms ease;
+    }
+
+    .preview-ticker.is-hidden {
+      min-height: 0;
+      opacity: 0;
+      transform: translateY(8px);
+      overflow: hidden;
+    }
+
+    .preview-ticker span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .lists {
-      margin-top: 16px;
+      margin-top: 18px;
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 12px;
     }
 
     .list-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
+      padding: 14px;
       min-height: 180px;
     }
 
@@ -112,13 +417,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       font-weight: 700;
     }
 
     .add-btn {
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       padding: 0;
       border-radius: 50%;
       background: var(--blue);
@@ -132,8 +437,8 @@
     }
 
     .item {
-      border: 1px solid #d3dbea;
-      border-radius: 8px;
+      border: 1px solid #d4dcec;
+      border-radius: 10px;
       padding: 8px;
       background: #fbfdff;
     }
@@ -152,13 +457,13 @@
 
     .btn-select {
       background: var(--orange);
-      padding: 6px 10px;
+      padding: 7px 10px;
       font-size: 12px;
     }
 
     .btn-delete {
       background: var(--red);
-      padding: 6px 10px;
+      padding: 7px 10px;
       font-size: 12px;
     }
 
@@ -168,46 +473,118 @@
       padding-top: 4px;
     }
 
+    @media (max-width: 1120px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media (max-width: 980px) {
-      .lists { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .lists {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
     }
 
     @media (max-width: 600px) {
-      .lists { grid-template-columns: 1fr; }
+      .lists {
+        grid-template-columns: 1fr;
+      }
+
+      .panel-head,
+      .preview-head,
+      .preview-header {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
   <main class="container">
-    <section class="panel">
-      <h1>Yönetici Ekranı</h1>
+    <section class="hero-grid">
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h1>Yönetici Ekranı</h1>
+            <p class="subtitle">Kürsü ekranına gönderilecek konuşmacı, sempozyum, konu ve duyuru bilgisini yönetin.</p>
+          </div>
+          <div id="statusChip" class="status-chip is-idle">Bekleme</div>
+        </div>
 
-      <div class="field">
-        <label for="speakerInput">Konuşmacı</label>
-        <input id="speakerInput" type="text" placeholder="İsim soyisim..." />
-      </div>
+        <div class="field">
+          <label for="speakerInput">Konuşmacı</label>
+          <input id="speakerInput" type="text" placeholder="İsim soyisim..." />
+        </div>
 
-      <div class="field">
-        <label for="symposiumInput">Sempozyum [ALT YAZI]</label>
-        <input id="symposiumInput" type="text" placeholder="Sempozyum adı..." />
-      </div>
+        <div class="field">
+          <label for="symposiumInput">Sempozyum [ALT YAZI]</label>
+          <input id="symposiumInput" type="text" placeholder="Sempozyum adı..." />
+        </div>
 
-      <div class="field">
-        <label for="topicInput">Toplantı Konusu [ÜST YAZI]</label>
-        <input id="topicInput" type="text" placeholder="Konu başlığı..." />
-      </div>
+        <div class="field">
+          <label for="topicInput">Toplantı Konusu [ÜST YAZI]</label>
+          <input id="topicInput" type="text" placeholder="Konu başlığı..." />
+        </div>
 
-      <div class="field">
-        <label for="tickerInput">Alt Yazı / Duyuru</label>
-        <input id="tickerInput" type="text" placeholder="Kayan metin mesajı..." />
-      </div>
+        <div class="field">
+          <label for="tickerInput">Alt Yazı / Duyuru</label>
+          <input id="tickerInput" type="text" placeholder="Kayan metin mesajı..." />
+        </div>
 
-      <div class="row">
-        <button class="btn-purple" id="publishTickerBtn" type="button">YAYINLA</button>
-        <button class="btn-gray" id="clearTickerBtn" type="button">KALDIR</button>
-      </div>
+        <div class="row">
+          <button class="btn-purple" id="publishTickerBtn" type="button">YAYINLA</button>
+          <button class="btn-gray" id="clearTickerBtn" type="button">KALDIR</button>
+        </div>
 
-      <button class="btn-green" id="sendLiveBtn" type="button">CANLI YAYINA GÖNDER</button>
+        <button class="btn-green" id="sendLiveBtn" type="button">CANLI YAYINA GÖNDER</button>
+      </section>
+
+      <aside class="panel preview-card">
+        <div class="preview-head">
+          <div>
+            <h2>Canlı Önizleme</h2>
+            <p class="preview-note">Kürsü ekranında yayınlanacak koyu sahne görünümünün küçük ölçekli önizlemesi.</p>
+          </div>
+          <div id="previewBadge" class="status-chip is-draft">Taslak</div>
+        </div>
+
+        <section class="preview-stage" aria-label="Kürsü ekranı önizlemesi">
+          <div class="preview-header">
+            <div class="preview-brand">
+              <div class="preview-logo-shell" id="previewLogoShell">
+                <img id="previewLogo" class="preview-logo" src="img/hastane.png" alt="Marmara Üniversitesi Pendik Eğitim ve Araştırma Hastanesi logosu" />
+              </div>
+              <div id="previewBrandFallback" class="preview-brand-fallback">
+                <strong>T.C. Sağlık Bakanlığı</strong>
+                <span>İstanbul İl Sağlık Müdürlüğü</span>
+                <span>Marmara Üniversitesi Pendik Eğitim ve Araştırma Hastanesi</span>
+              </div>
+            </div>
+
+            <div class="preview-clock">
+              <div id="previewClockTime" class="preview-clock-time">00:00:00</div>
+              <div id="previewClockDate" class="preview-clock-date">11 Ağustos 2026</div>
+            </div>
+          </div>
+
+          <div class="preview-copy">
+            <div id="previewContent">
+              <p id="previewTopic" class="preview-topic"></p>
+              <div id="previewLine" class="preview-line" aria-hidden="true"></div>
+              <h3 id="previewSpeaker" class="preview-speaker"></h3>
+              <div id="previewSpeakerBar" class="preview-speaker-bar" aria-hidden="true"></div>
+            </div>
+
+            <div id="previewIdle" class="preview-idle">
+              <strong>Yayın bekleniyor</strong>
+              <span>Konuşmacı ve konu bilgisi gönderildiğinde kürsü ekranı otomatik güncellenir.</span>
+            </div>
+          </div>
+
+          <footer id="previewTicker" class="preview-ticker is-hidden">
+            <span id="previewTickerText"></span>
+          </footer>
+        </section>
+      </aside>
     </section>
 
     <section class="lists">
@@ -283,7 +660,16 @@
         }
       }
 
-      let state = readJson(STORAGE_STATE_KEY, defaultState);
+      function normalizeState(rawState) {
+        return {
+          speaker: String(rawState && rawState.speaker ? rawState.speaker : "").trim(),
+          symposium: String(rawState && rawState.symposium ? rawState.symposium : "").trim(),
+          topic: String(rawState && rawState.topic ? rawState.topic : "").trim(),
+          ticker: String(rawState && rawState.ticker ? rawState.ticker : "").trim()
+        };
+      }
+
+      let state = normalizeState(readJson(STORAGE_STATE_KEY, defaultState));
       let lists = readJson(STORAGE_LISTS_KEY, defaultLists);
 
       const channel = "BroadcastChannel" in window ? new BroadcastChannel(CHANNEL_NAME) : null;
@@ -292,13 +678,30 @@
       const symposiumInput = document.getElementById("symposiumInput");
       const topicInput = document.getElementById("topicInput");
       const tickerInput = document.getElementById("tickerInput");
+      const statusChip = document.getElementById("statusChip");
+      const previewBadge = document.getElementById("previewBadge");
+
+      const previewTopic = document.getElementById("previewTopic");
+      const previewSpeaker = document.getElementById("previewSpeaker");
+      const previewLine = document.getElementById("previewLine");
+      const previewSpeakerBar = document.getElementById("previewSpeakerBar");
+      const previewContent = document.getElementById("previewContent");
+      const previewIdle = document.getElementById("previewIdle");
+      const previewTicker = document.getElementById("previewTicker");
+      const previewTickerText = document.getElementById("previewTickerText");
+      const previewClockTime = document.getElementById("previewClockTime");
+      const previewClockDate = document.getElementById("previewClockDate");
+      const previewLogo = document.getElementById("previewLogo");
+      const previewLogoShell = document.getElementById("previewLogoShell");
+      const previewBrandFallback = document.getElementById("previewBrandFallback");
 
       function saveState(nextState) {
-        state = { ...defaultState, ...nextState };
+        state = normalizeState(nextState);
         localStorage.setItem(STORAGE_STATE_KEY, JSON.stringify(state));
         if (channel) {
           channel.postMessage({ type: "state_update", payload: state });
         }
+        syncPreview();
       }
 
       function saveLists() {
@@ -310,6 +713,73 @@
         symposiumInput.value = state.symposium || "";
         topicInput.value = state.topic || "";
         tickerInput.value = state.ticker || "";
+      }
+
+      function getDraftState() {
+        return normalizeState({
+          speaker: speakerInput.value,
+          symposium: symposiumInput.value,
+          topic: topicInput.value,
+          ticker: tickerInput.value
+        });
+      }
+
+      function isIdle(nextState) {
+        return !nextState.topic && !nextState.speaker;
+      }
+
+      function isSameState(leftState, rightState) {
+        return leftState.speaker === rightState.speaker
+          && leftState.symposium === rightState.symposium
+          && leftState.topic === rightState.topic
+          && leftState.ticker === rightState.ticker;
+      }
+
+      function updateStatusChip(nextState) {
+        statusChip.className = "status-chip";
+
+        if (isIdle(nextState)) {
+          statusChip.classList.add("is-idle");
+          statusChip.textContent = "Bekleme";
+          return;
+        }
+
+        statusChip.textContent = "Yayında";
+      }
+
+      function updatePreview(stateToRender, mode) {
+        const previewState = normalizeState(stateToRender);
+        const idle = isIdle(previewState);
+        const tickerText = [previewState.symposium, previewState.ticker].filter(Boolean).join("  •  ");
+
+        previewTopic.textContent = previewState.topic;
+        previewSpeaker.textContent = previewState.speaker;
+        previewTopic.style.display = previewState.topic ? "block" : "none";
+        previewLine.style.display = previewState.topic ? "block" : "none";
+        previewSpeakerBar.style.display = previewState.speaker ? "block" : "none";
+        previewContent.style.display = idle ? "none" : "block";
+        previewIdle.classList.toggle("is-visible", idle);
+        previewTicker.classList.toggle("is-hidden", !tickerText);
+        previewTickerText.textContent = tickerText;
+
+        previewBadge.className = "status-chip";
+        if (mode === "live") {
+          previewBadge.textContent = idle ? "Bekleme" : "Yayında";
+          if (idle) {
+            previewBadge.classList.add("is-idle");
+          }
+          return;
+        }
+
+        previewBadge.textContent = "Taslak";
+        previewBadge.classList.add("is-draft");
+      }
+
+      function syncPreview() {
+        const draftState = getDraftState();
+        const liveMode = isSameState(draftState, state);
+        updateStatusChip(state);
+        updatePreview(liveMode ? state : draftState, liveMode ? "live" : "draft");
       }
 
       function createItemElement(listName, value, index) {
@@ -332,6 +802,7 @@
           const inputId = fieldMap[listName];
           const target = document.getElementById(inputId);
           target.value = value;
+          syncPreview();
         });
 
         const deleteBtn = document.createElement("button");
@@ -352,7 +823,7 @@
 
       function renderList(listName) {
         const container = document.getElementById(listName + "List");
-        container.innerHTML = "";
+        container.textContent = "";
         const items = lists[listName] || [];
 
         if (!items.length) {
@@ -383,6 +854,22 @@
         renderLists();
       }
 
+      function updateClock() {
+        const now = new Date();
+        previewClockTime.textContent = now.toLocaleTimeString("tr-TR", { hour12: false });
+        previewClockDate.textContent = now.toLocaleDateString("tr-TR", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric"
+        });
+      }
+
+      function showPreviewFallback() {
+        previewLogo.style.display = "none";
+        previewLogoShell.classList.add("is-fallback");
+        previewBrandFallback.style.display = "block";
+      }
+
       document.querySelectorAll(".add-btn").forEach(function (btn) {
         btn.addEventListener("click", function () {
           addListItem(btn.dataset.list);
@@ -392,7 +879,7 @@
       document.getElementById("publishTickerBtn").addEventListener("click", function () {
         saveState({
           ...state,
-          ticker: tickerInput.value.trim()
+          ticker: tickerInput.value
         });
       });
 
@@ -405,24 +892,38 @@
       });
 
       document.getElementById("sendLiveBtn").addEventListener("click", function () {
-        saveState({
-          speaker: speakerInput.value.trim(),
-          symposium: symposiumInput.value.trim(),
-          topic: topicInput.value.trim(),
-          ticker: tickerInput.value.trim()
-        });
+        saveState(getDraftState());
       });
+
+      [speakerInput, symposiumInput, topicInput, tickerInput].forEach(function (input) {
+        input.addEventListener("input", syncPreview);
+      });
+
+      if (channel) {
+        channel.addEventListener("message", function (event) {
+          if (!event.data || event.data.type !== "state_update") return;
+          state = normalizeState({ ...defaultState, ...event.data.payload });
+          fillFormFromState();
+          syncPreview();
+        });
+      }
 
       window.addEventListener("storage", function (event) {
         if (event.key !== STORAGE_STATE_KEY || !event.newValue) return;
         try {
-          state = { ...defaultState, ...JSON.parse(event.newValue) };
+          state = normalizeState({ ...defaultState, ...JSON.parse(event.newValue) });
           fillFormFromState();
+          syncPreview();
         } catch (_) {}
       });
 
+      previewLogo.addEventListener("error", showPreviewFallback);
+
       fillFormFromState();
       renderLists();
+      updateClock();
+      window.setInterval(updateClock, 1000);
+      syncPreview();
     })();
   </script>
 </body>

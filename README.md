@@ -30,9 +30,16 @@ Bu proje, **Node.js / port / WebSocket gerektirmeden** çalışan, IIS altında 
 
 ## Logo Notu
 
-- Kürsü ekranı `logo.png` dosyasını kök klasörden yüklemeyi dener.
-- Logo kullanmak için `logo.png` dosyasını aynı klasöre ekleyin.
-- Dosya yoksa ekran bozulmaz; logo otomatik gizlenir.
+- Kürsü ekranı logoyu `img/hastane.png` yolundan yüklemeyi dener.
+- Logo varsa üstte yalnızca görsel gösterilir; aynı başlık metni tekrar yazdırılmaz.
+- Dosya yoksa ekran bozulmaz; logo gizlenir ve kurum başlığı metin fallback olarak gösterilir.
+
+## Kürsü Ekranı Özellikleri
+
+- `kursu.html` koyu sinematik sahne görünümü, kırmızı konu başlığı ve beyaz dev konuşmacı vurgusu ile LED/projeksiyon ekranları için optimize edilmiştir.
+- Sağ üstte canlı saat/tarih ve tam ekran düğmesi bulunur.
+- Konuşmacı ve konu boş olduğunda zarif bir bekleme modu görünür.
+- Alt bant sempozyum ve duyuru bilgisini kayan kırmızı bantta gösterir; içerik yoksa bant gizlenir.
 
 ## Teknik Not
 
