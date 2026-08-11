@@ -161,6 +161,9 @@
 
         const barText = [state.symposium, state.ticker].filter(Boolean).join(" / ");
         marqueeEl.textContent = barText || "";
+        marqueeEl.style.animation = "none";
+        void marqueeEl.offsetWidth;
+        marqueeEl.style.animation = "";
       }
 
       render(readState());
