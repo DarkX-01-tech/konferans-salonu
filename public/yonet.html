@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yönetim Paneli – Konferans Salonu</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #eee; min-height: 100vh; padding: 20px; }
+  h1 { text-align: center; font-size: 1.4rem; margin-bottom: 20px; color: #a78bfa; letter-spacing: 1px; text-transform: uppercase; }
+
+  .panel { background: #16213e; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  .panel h2 { font-size: 1rem; color: #a78bfa; margin-bottom: 14px; border-bottom: 1px solid #2d2d5e; padding-bottom: 8px; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  label { display: block; font-size: 0.78rem; color: #94a3b8; margin-bottom: 4px; }
+  input[type="text"] { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #2d2d5e; background: #0f3460; color: #eee; font-size: 0.95rem; }
+  input[type="text"]:focus { outline: none; border-color: #a78bfa; }
+
+  .btn-row { display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+  .btn { padding: 10px 22px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: 600; transition: opacity .2s; }
+  .btn:hover { opacity: .85; }
+  .btn-yayinla  { background: #7c3aed; color: #fff; }
+  .btn-kaldir   { background: #475569; color: #fff; }
+  .btn-canli    { background: #16a34a; color: #fff; font-size: 1.05rem; padding: 12px 32px; width: 100%; margin-top: 10px; }
+
+  .canli-durumu { text-align: center; margin-top: 8px; font-size: 0.85rem; color: #94a3b8; }
+  .canli-durumu span { color: #4ade80; font-weight: 700; }
+
+  .listeler { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  @media (max-width: 900px) { .listeler { grid-template-columns: repeat(2, 1fr); } .form-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 500px) { .listeler { grid-template-columns: 1fr; } }
+
+  .kart { background: #16213e; border-radius: 12px; padding: 16px; }
+  .kart h3 { font-size: 0.9rem; color: #f8fafc; margin-bottom: 10px; border-bottom: 1px solid #2d2d5e; padding-bottom: 6px; }
+  .kart-ekle { display: flex; gap: 6px; margin-bottom: 10px; }
+  .kart-ekle input { flex: 1; padding: 7px 10px; border-radius: 6px; border: 1px solid #2d2d5e; background: #0f3460; color: #eee; font-size: 0.85rem; }
+  .kart-ekle button { background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 7px 12px; cursor: pointer; font-size: 1.1rem; font-weight: 700; }
+  .liste-oge { display: flex; align-items: center; gap: 5px; margin-bottom: 6px; background: #0f3460; border-radius: 6px; padding: 6px 8px; font-size: 0.82rem; }
+  .liste-oge span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .btn-sec  { background: #f97316; color: #fff; border: none; border-radius: 4px; padding: 3px 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600; }
+  .btn-sil  { background: #dc2626; color: #fff; border: none; border-radius: 4px; padding: 3px 8px; cursor: pointer; font-size: 0.75rem; }
+</style>
+</head>
+<body>
+
+<h1>🎤 Konferans Salonu – Yönetim Paneli</h1>
+
+<div class="panel">
+  <h2>Yayın Bilgileri</h2>
+  <div class="form-grid">
+    <div>
+      <label>Konuşmacı (İsim Soyisim)</label>
+      <input type="text" id="konusmaci" placeholder="Konuşmacı adı...">
+    </div>
+    <div>
+      <label>Sempozyum [ALT YAZI]</label>
+      <input type="text" id="sempozyum" placeholder="Sempozyum adı...">
+    </div>
+    <div>
+      <label>Toplantı Konusu [ÜST YAZI]</label>
+      <input type="text" id="konu" placeholder="Toplantı konusu...">
+    </div>
+    <div>
+      <label>Alt Yazı / Duyuru (kayan yazı)</label>
+      <input type="text" id="duyuru" placeholder="Duyuru metni...">
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-yayinla" onclick="yayinla()">YAYINLA</button>
+    <button class="btn btn-kaldir" onclick="kaldir()">KALDIR</button>
+  </div>
+  <button class="btn btn-canli" onclick="canliyaGonder()">🟢 CANLI YAYINA GÖNDER</button>
+  <div class="canli-durumu" id="durum">Durum: <span>Hazır</span></div>
+</div>
+
+<div class="listeler" id="listeler">
+  <!-- Kartlar JS ile doldurulacak -->
+</div>
+
+<script>
+const ALANLAR = {
+  konusmaci: 'Konuşmacılar',
+  sempozyum: 'Sempozyumlar',
+  konu: 'Konular',
+  duyuru: 'Duyurular'
+};
+
+async function loadState() {
+  const res = await fetch('/api/state');
+  const data = await res.json();
+  // Yayın alanlarını doldur
+  ['konusmaci','sempozyum','konu','duyuru'].forEach(k => {
+    document.getElementById(k).value = data.broadcast[k] || '';
+  });
+  renderListeler(data.listeler);
+}
+
+function renderListeler(listeler) {
+  const el = document.getElementById('listeler');
+  el.innerHTML = '';
+  Object.entries(ALANLAR).forEach(([tip, baslik]) => {
+    const ogeler = listeler[tip] || [];
+    const kart = document.createElement('div');
+    kart.className = 'kart';
+    kart.innerHTML = `
+      <h3>${baslik}</h3>
+      <div class="kart-ekle">
+        <input type="text" id="yeni_${tip}" placeholder="Yeni ekle...">
+        <button onclick="listEkle('${tip}')">+</button>
+      </div>
+      <div id="liste_${tip}"></div>`;
+
+    const listeDiv = kart.querySelector('#liste_' + tip);
+    ogeler.forEach(v => {
+      const oge = document.createElement('div');
+      oge.className = 'liste-oge';
+      const span = document.createElement('span');
+      span.title = v;
+      span.textContent = v;
+      const btnSec = document.createElement('button');
+      btnSec.className = 'btn-sec';
+      btnSec.textContent = 'SEÇ';
+      btnSec.addEventListener('click', () => sec(tip, v));
+      const btnSil = document.createElement('button');
+      btnSil.className = 'btn-sil';
+      btnSil.textContent = 'sil';
+      btnSil.addEventListener('click', () => listSil(tip, v));
+      oge.appendChild(span);
+      oge.appendChild(btnSec);
+      oge.appendChild(btnSil);
+      listeDiv.appendChild(oge);
+    });
+
+    el.appendChild(kart);
+  });
+}
+
+function sec(tip, value) {
+  document.getElementById(tip).value = value;
+}
+
+async function listEkle(tip) {
+  const input = document.getElementById('yeni_' + tip);
+  const value = input.value.trim();
+  if (!value) return;
+  await fetch('/api/list/add', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ tip, value }) });
+  input.value = '';
+  loadState();
+}
+
+async function listSil(tip, value) {
+  await fetch('/api/list/remove', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ tip, value }) });
+  loadState();
+}
+
+async function yayinla() {
+  const body = getBroadcastBody();
+  await fetch('/api/broadcast', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  setDurum('Yayınlandı ✓');
+}
+
+async function kaldir() {
+  await fetch('/api/clear', { method: 'POST' });
+  ['konusmaci','sempozyum','konu','duyuru'].forEach(k => document.getElementById(k).value = '');
+  setDurum('Yayın kaldırıldı');
+}
+
+async function canliyaGonder() {
+  const body = getBroadcastBody();
+  await fetch('/api/broadcast', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  setDurum('🟢 CANLI YAYINDA');
+}
+
+function getBroadcastBody() {
+  return {
+    konusmaci: document.getElementById('konusmaci').value,
+    sempozyum: document.getElementById('sempozyum').value,
+    konu: document.getElementById('konu').value,
+    duyuru: document.getElementById('duyuru').value
+  };
+}
+
+function setDurum(msg) {
+  document.getElementById('durum').innerHTML = 'Durum: <span>' + msg + '</span>';
+}
+
+loadState();
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "broadcast": {
+    "konusmaci": "",
+    "sempozyum": "",
+    "konu": "",
+    "duyuru": ""
+  },
+  "listeler": {
+    "konusmaci": [],
+    "sempozyum": [],
+    "konu": [],
+    "duyuru": []
+  }
+}
