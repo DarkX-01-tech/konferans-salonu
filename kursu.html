@@ -22,9 +22,9 @@
       font-family: Arial, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(1200px 600px at 85% -10%, #eef2fb 0%, rgba(238,242,251,0) 60%),
-        radial-gradient(900px 500px at 0% 110%, #f4f7fd 0%, rgba(244,247,253,0) 55%),
-        #ffffff;
+        radial-gradient(1200px 600px at 85% -10%, #e3ecfb 0%, rgba(227,236,251,0) 60%),
+        radial-gradient(900px 500px at 0% 110%, #ecf1fb 0%, rgba(236,241,251,0) 55%),
+        linear-gradient(180deg, #f7f9ff 0%, #ffffff 100%);
       display: flex;
       flex-direction: column;
     }
@@ -50,23 +50,25 @@
       flex: 0 0 auto;
     }
 
-    /* Sağ üst köşe: saat + tarih — glass kart */
+    /* Sağ üst köşe: saat + tarih — belirgin GLASS kart */
     .clock-wrap {
       flex: 0 0 auto;
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 4px;
-      padding: 12px 20px;
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.55);
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      box-shadow: 0 8px 24px rgba(20, 32, 62, 0.10);
-      -webkit-backdrop-filter: blur(12px) saturate(140%);
-      backdrop-filter: blur(12px) saturate(140%);
+      gap: 6px;
+      padding: 14px 24px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.38), rgba(255,255,255,0.18));
+      border: 1.5px solid rgba(255, 255, 255, 0.9);
+      box-shadow:
+        0 10px 30px rgba(20, 32, 62, 0.16),
+        inset 0 1px 0 rgba(255,255,255,0.9);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+      backdrop-filter: blur(18px) saturate(160%);
     }
     .clock-time {
-      font-size: clamp(26px, 2.6vw, 46px);
+      font-size: clamp(28px, 2.8vw, 50px);
       font-weight: 900;
       color: var(--text);
       letter-spacing: 2px;
@@ -75,10 +77,11 @@
       display: flex;
       align-items: baseline;
       gap: 6px;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.6);
     }
     .clock-seconds {
-      font-size: clamp(14px, 1.3vw, 22px);
-      font-weight: 700;
+      font-size: clamp(15px, 1.4vw, 24px);
+      font-weight: 800;
       color: var(--red);
     }
     .clock-date {
@@ -200,6 +203,34 @@
       0%   { transform: translateX(100vw); }
       100% { transform: translateX(-100%); }
     }
+
+    /* ── Tam ekran geçiş katmanı (yönetici komutu sonrası) ─── */
+    #fsOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(20, 32, 62, 0.35);
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
+      cursor: pointer;
+    }
+    #fsOverlay.show { display: flex; }
+    .fs-box {
+      background: rgba(255,255,255,0.85);
+      border: 1.5px solid rgba(255,255,255,0.95);
+      border-radius: 22px;
+      padding: 34px 54px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(20,32,62,0.3);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+    }
+    .fs-box .fs-icon { font-size: 54px; line-height: 1; }
+    .fs-box .fs-text { margin-top: 12px; font-size: 22px; font-weight: 800; color: var(--text); }
+    .fs-box .fs-sub  { margin-top: 4px; font-size: 15px; color: var(--muted); font-weight: 600; }
   </style>
 </head>
 <body>
@@ -236,6 +267,15 @@
   <footer class="bottom">
     <div id="marqueeEl" class="marquee"></div>
   </footer>
+
+  <!-- Tam ekran geçiş katmanı: yönetici komutu gelince belirir, tıklayınca tam ekran -->
+  <div id="fsOverlay" title="Tam ekrana geçmek için tıklayın">
+    <div class="fs-box">
+      <div class="fs-icon">⛶</div>
+      <div class="fs-text" id="fsText">Tam Ekrana Geç</div>
+      <div class="fs-sub">Devam etmek için ekrana tıklayın</div>
+    </div>
+  </div>
 
   <script>
     (function () {
@@ -279,7 +319,6 @@
         var maxW = window.innerWidth * 0.90; /* ekranın %90'ı */
         var size = parseFloat(getComputedStyle(speakerEl).fontSize);
         var guard = 0;
-        /* Metin çok uzunsa taşmayı önlemek için fontu kademeli küçült */
         while (speakerEl.scrollWidth > maxW && size > 24 && guard < 200) {
           size -= 2;
           speakerEl.style.fontSize = size + "px";
@@ -294,37 +333,29 @@
         var hasSymposium = !!state.symposium;
         var hasContent   = hasSpeaker || hasTopic || hasSymposium;
 
-        /* Bekleme ↔ içerik gösterimi */
         waitingEl.style.display  = hasContent ? "none"  : "flex";
         contentEl.style.display  = hasContent ? "flex"  : "none";
 
-        /* Bekleme mesajı: özel metin varsa onu, yoksa varsayılanı göster */
         waitingText.textContent = state.waiting || DEFAULT_WAITING;
 
-        /* Metinler (XSS güvenliği: textContent) */
         symposiumEl.textContent = state.symposium || "";
         topicEl.textContent     = state.topic     || "";
         speakerEl.textContent   = state.speaker   || "";
 
-        /* Sempozyum ve ayırıcılar: içerik yoksa gizle */
         symposiumEl.style.display = hasSymposium ? "" : "none";
         divTop.style.display      = hasSymposium ? "" : "none";
         divBot.style.display      = (hasTopic && hasSpeaker) ? "" : "none";
 
-        /* Konuşmacı adını tek satırda sığdır */
         if (hasSpeaker) fitSpeaker();
 
-        /* Alt bant: SADECE duyuru (ticker); yoksa kurumsal varsayılan metin.
-           NOT: Sempozyum adı alt banta EKLENMEZ. */
+        /* Alt bant: SADECE duyuru; yoksa kurumsal varsayılan. Sempozyum EKLENMEZ. */
         marqueeEl.textContent = state.ticker || DEFAULT_TICKER;
 
-        /* Animasyonu sıfırla (kaydırma yeniden başlasın) */
         marqueeEl.style.animation = "none";
         void marqueeEl.offsetWidth;
         marqueeEl.style.animation = "";
       }
 
-      /* Pencere yeniden boyutlanınca konuşmacı adını yeniden sığdır */
       window.addEventListener("resize", fitSpeaker);
 
       /* ── Canlı saat ──────────────────────────────────────── */
@@ -354,33 +385,65 @@
       /* ── İlk render ──────────────────────────────────────── */
       render(readState());
 
+      /* ── Tam ekran ────────────────────────────────────────── */
+      var fsOverlay = document.getElementById("fsOverlay");
+      var fsText    = document.getElementById("fsText");
+
+      function enterFullscreen() {
+        var el = document.documentElement;
+        if (el.requestFullscreen) el.requestFullscreen().catch(function(){});
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+      }
+      function exitFullscreen() {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      }
+
+      /* Yönetici komutu gelince: doğrudan tam ekran denenir; tarayıcı
+         kullanıcı jesti isterse ekranda tıklanabilir katman gösterilir. */
+      function requestFullscreenFromAdmin() {
+        if (document.fullscreenElement) { exitFullscreen(); return; }
+        /* Önce doğrudan dene (bazı tarayıcı/politikalarda çalışır) */
+        try { enterFullscreen(); } catch (_) {}
+        /* Kısa süre sonra hâlâ tam ekran değilse katmanı göster */
+        setTimeout(function () {
+          if (!document.fullscreenElement) {
+            fsText.textContent = "Tam Ekrana Geç";
+            fsOverlay.classList.add("show");
+          }
+        }, 250);
+      }
+
+      /* Katmana tıklayınca tam ekrana geç (bu gerçek kullanıcı jestidir) */
+      fsOverlay.addEventListener("click", function () {
+        enterFullscreen();
+        fsOverlay.classList.remove("show");
+      });
+
+      /* Çift tıkla veya F tuşu ile de tam ekran/çıkış (yedek) */
+      document.addEventListener("dblclick", function () {
+        if (document.fullscreenElement) exitFullscreen(); else enterFullscreen();
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "f" || e.key === "F") {
+          if (document.fullscreenElement) exitFullscreen(); else enterFullscreen();
+        }
+        if (e.key === "Escape") fsOverlay.classList.remove("show");
+      });
+
       /* ── BroadcastChannel dinle ───────────────────────────── */
       if ("BroadcastChannel" in window) {
         var ch = new BroadcastChannel(CHANNEL_NAME);
         ch.addEventListener("message", function (ev) {
           if (!ev.data) return;
-          /* Durum güncellemesi */
           if (ev.data.type === "state_update") {
             render(Object.assign({}, defaultState, ev.data.payload));
           }
-          /* Yönetici panelinden gelen tam ekran komutu */
           if (ev.data.type === "toggle_fullscreen") {
-            toggleFullscreen();
+            requestFullscreenFromAdmin();
           }
         });
       }
-
-      /* ── Tam ekran ────────────────────────────────────────── */
-      function toggleFullscreen() {
-        if (!document.fullscreenElement) {
-          var el = document.documentElement;
-          if (el.requestFullscreen) el.requestFullscreen().catch(function(){});
-        } else {
-          if (document.exitFullscreen) document.exitFullscreen();
-        }
-      }
-      /* Kürsü ekranına tıklayınca da tam ekran (yedek yöntem) */
-      document.addEventListener("dblclick", toggleFullscreen);
 
       /* ── localStorage değişikliği (farklı sekme) ──────────── */
       window.addEventListener("storage", function (ev) {
