@@ -6,123 +6,266 @@
   <title>Konferans Salonu - Kürsü Ekranı</title>
   <style>
     :root {
-      --red: #cc2029;
-      --text: #1b2736;
-      --muted: #4c5b6c;
+      --bg: #f7f8fa;
+      --bg-soft: #ffffff;
+      --text-strong: #161f2c;
+      --text-muted: #3b4657;
+      --accent-red: #cc2029;
+      --line: #e3e7ee;
+      --marquee: #c91f29;
+      --marquee-dark: #a9161f;
     }
 
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: Arial, sans-serif;
-      color: var(--text);
-      background: #fff;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--text-strong);
+      background: linear-gradient(145deg, #ffffff 0%, var(--bg) 100%);
       display: flex;
       flex-direction: column;
     }
 
     .header {
       display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 24px 32px 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(8px);
+    }
+
+    .brand {
+      display: flex;
       align-items: center;
-      gap: 22px;
-      padding: 24px 30px 16px;
-      border-bottom: 1px solid #ebedf2;
+      min-height: 84px;
     }
 
     .logo {
-      width: 110px;
-      height: 110px;
+      width: 112px;
+      height: 112px;
       object-fit: contain;
-      flex: 0 0 auto;
+      filter: drop-shadow(0 8px 18px rgba(25, 36, 54, 0.12));
     }
 
-    .titles {
-      line-height: 1.3;
-    }
-
-    .titles .line1 {
-      font-size: clamp(22px, 2.4vw, 42px);
+    .brand-fallback {
+      display: none;
+      font-size: clamp(18px, 1.6vw, 30px);
       font-weight: 800;
-      letter-spacing: .4px;
+      color: var(--text-strong);
+      letter-spacing: 0.03em;
     }
 
-    .titles .line2,
-    .titles .line3 {
-      font-size: clamp(18px, 1.7vw, 30px);
-      color: var(--muted);
-      font-weight: 700;
-    }
-
-    .center {
-      flex: 1;
+    .meta {
       display: flex;
       align-items: center;
+      gap: 12px;
+    }
+
+    .clock {
+      text-align: right;
+      font-weight: 700;
+      color: var(--text-muted);
+      min-width: 250px;
+      line-height: 1.25;
+    }
+
+    .clock .time {
+      font-size: clamp(24px, 2.1vw, 40px);
+      color: var(--text-strong);
+      font-weight: 800;
+      letter-spacing: 0.03em;
+    }
+
+    .clock .date {
+      font-size: clamp(14px, 1.1vw, 20px);
+      text-transform: capitalize;
+    }
+
+    .fullscreen-btn {
+      border: 1px solid #d9dee8;
+      background: linear-gradient(180deg, #ffffff, #f2f5fa);
+      color: #223046;
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 7px 16px rgba(22, 33, 52, 0.12);
+      white-space: nowrap;
+    }
+
+    .fullscreen-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(22, 33, 52, 0.17);
+    }
+
+    .stage {
+      flex: 1;
+      display: flex;
       justify-content: center;
-      text-align: center;
-      padding: 24px 32px;
+      align-items: center;
+      padding: 28px 32px;
     }
 
     .content {
-      max-width: 95vw;
+      width: min(1720px, 96vw);
+      min-height: min(66vh, 680px);
+      padding: clamp(24px, 2.8vw, 56px);
+      border-radius: 26px;
+      background: var(--bg-soft);
+      border: 1px solid var(--line);
+      box-shadow: 0 24px 52px rgba(18, 34, 57, 0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      gap: clamp(22px, 2.3vh, 34px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .content.updating {
+      opacity: 0.55;
+      transform: translateY(6px);
+    }
+
+    .symposium,
+    .topic,
+    .speaker {
+      margin: 0;
+      width: 100%;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: opacity 0.25s ease;
+      line-height: 1.1;
+      word-break: break-word;
+    }
+
+    .symposium {
+      font-size: clamp(28px, 3.4vw, 62px);
+      color: #2c3440;
+      font-weight: 700;
     }
 
     .topic {
-      margin: 0 0 24px;
-      font-size: clamp(36px, 5vw, 90px);
+      font-size: clamp(34px, 4.3vw, 82px);
+      color: var(--accent-red);
       font-weight: 800;
-      text-transform: uppercase;
-      color: #24364f;
     }
 
     .speaker {
-      margin: 0;
-      font-size: clamp(34px, 7vw, 108px);
+      font-size: clamp(48px, 8vw, 130px);
+      color: var(--text-strong);
       font-weight: 900;
-      color: #161f2c;
+    }
+
+    .divider {
+      width: min(68%, 980px);
+      height: 1px;
+      background: var(--line);
+      opacity: 0.95;
+    }
+
+    .waiting {
+      display: none;
+      margin-top: 4px;
+      color: #718199;
+      font-size: clamp(26px, 2.4vw, 40px);
+      letter-spacing: 0.08em;
       text-transform: uppercase;
+      font-weight: 700;
+      animation: pulse 1.9s ease-in-out infinite;
+    }
+
+    .content.is-waiting .waiting {
+      display: block;
+    }
+
+    .content.is-waiting .symposium,
+    .content.is-waiting .topic,
+    .content.is-waiting .speaker,
+    .content.is-waiting .divider {
+      opacity: 0.2;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
     }
 
     .bottom {
-      background: var(--red);
-      color: #fff;
-      height: 86px;
+      height: 84px;
+      border-top: 4px solid var(--marquee-dark);
+      background: linear-gradient(90deg, var(--marquee-dark), var(--marquee));
       display: flex;
       align-items: center;
       overflow: hidden;
-      border-top: 4px solid #b11622;
+      color: #fff;
+      box-shadow: 0 -8px 18px rgba(140, 12, 24, 0.25);
     }
 
     .marquee {
       display: inline-block;
       white-space: nowrap;
-      transform: translateX(100vw);
-      animation: ticker 22s linear infinite;
-      font-size: clamp(22px, 2vw, 34px);
+      padding-left: 100%;
+      animation: ticker 24s linear infinite;
+      font-size: clamp(24px, 2vw, 34px);
       font-weight: 700;
+      letter-spacing: 0.02em;
     }
 
     @keyframes ticker {
-      0% { transform: translateX(100vw); }
+      0% { transform: translateX(0); }
       100% { transform: translateX(-100%); }
+    }
+
+    @media (max-width: 1024px) {
+      .header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .meta {
+        justify-content: space-between;
+      }
+
+      .clock {
+        min-width: 0;
+        text-align: left;
+      }
     }
   </style>
 </head>
 <body>
   <header class="header">
-    <img id="logo" class="logo" src="logo.png" alt="Logo" onerror="this.style.display='none'" />
-    <div class="titles">
-      <div class="line1">T.C. SAĞLIK BAKANLIĞI</div>
-      <div class="line2">İSTANBUL İL SAĞLIK MÜDÜRLÜĞÜ</div>
-      <div class="line3">Marmara Üniversitesi Pendik Eğitim ve Araştırma Hastanesi</div>
+    <div class="brand">
+      <img id="logo" class="logo" src="img/hastane.png" alt="Kurum Logosu" />
+      <div id="brandFallback" class="brand-fallback">T.C. SAĞLIK BAKANLIĞI</div>
+    </div>
+    <div class="meta">
+      <div id="clock" class="clock">
+        <div class="time">--:--:--</div>
+        <div class="date">--</div>
+      </div>
+      <button id="fullscreenBtn" class="fullscreen-btn" type="button">TAM EKRAN</button>
     </div>
   </header>
 
-  <main class="center">
-    <div class="content">
-      <h1 id="topic" class="topic"></h1>
-      <h2 id="speaker" class="speaker"></h2>
-    </div>
+  <main class="stage">
+    <section id="content" class="content" aria-live="polite">
+      <h1 id="symposium" class="symposium"></h1>
+      <div class="divider"></div>
+      <h2 id="topic" class="topic"></h2>
+      <div class="divider"></div>
+      <h3 id="speaker" class="speaker"></h3>
+      <div class="waiting">Yayın bekleniyor</div>
+    </section>
   </main>
 
   <footer class="bottom">
@@ -133,17 +276,17 @@
     (function () {
       const STORAGE_STATE_KEY = "konferans_state";
       const CHANNEL_NAME = "konferans_channel";
+      const defaultState = { speaker: "", symposium: "", topic: "", ticker: "" };
 
-      const defaultState = {
-        speaker: "",
-        symposium: "",
-        topic: "",
-        ticker: ""
-      };
-
+      const contentEl = document.getElementById("content");
+      const symposiumEl = document.getElementById("symposium");
       const topicEl = document.getElementById("topic");
       const speakerEl = document.getElementById("speaker");
       const marqueeEl = document.getElementById("marquee");
+      const logoEl = document.getElementById("logo");
+      const brandFallbackEl = document.getElementById("brandFallback");
+      const clockEl = document.getElementById("clock");
+      const fullscreenBtn = document.getElementById("fullscreenBtn");
 
       function readState() {
         try {
@@ -155,18 +298,83 @@
         }
       }
 
+      function fitText(el, minSize) {
+        if (!el || !el.textContent.trim()) return;
+        const clampMatch = getComputedStyle(el).fontSize;
+        const start = parseFloat(clampMatch);
+        if (!Number.isFinite(start)) return;
+        let size = start;
+        while ((el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientHeight) && size > minSize) {
+          size -= 1;
+          el.style.fontSize = size + "px";
+        }
+      }
+
+      function applyWaitingMode(state) {
+        const isWaiting = !state.speaker && !state.topic && !state.symposium;
+        contentEl.classList.toggle("is-waiting", isWaiting);
+      }
+
+      function animateUpdate() {
+        contentEl.classList.add("updating");
+        window.setTimeout(function () {
+          contentEl.classList.remove("updating");
+        }, 210);
+      }
+
       function render(state) {
+        animateUpdate();
+
+        symposiumEl.textContent = state.symposium || "";
         topicEl.textContent = state.topic || "";
         speakerEl.textContent = state.speaker || "";
 
-        const barText = [state.symposium, state.ticker].filter(Boolean).join(" / ");
-        marqueeEl.textContent = barText || "";
+        symposiumEl.style.fontSize = "";
+        topicEl.style.fontSize = "";
+        speakerEl.style.fontSize = "";
+
+        fitText(symposiumEl, 24);
+        fitText(topicEl, 28);
+        fitText(speakerEl, 34);
+
+        const marqueeText = [state.symposium, state.ticker].filter(Boolean).join(" • ");
+        marqueeEl.textContent = marqueeText || "Konferans yayını hazır";
         marqueeEl.style.animation = "none";
         void marqueeEl.offsetWidth;
         marqueeEl.style.animation = "";
+
+        applyWaitingMode(state);
       }
 
+      function updateClock() {
+        const now = new Date();
+        const time = now.toLocaleTimeString("tr-TR");
+        const date = now.toLocaleDateString("tr-TR", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        });
+        clockEl.querySelector(".time").textContent = time;
+        clockEl.querySelector(".date").textContent = date;
+      }
+
+      logoEl.onerror = function () {
+        logoEl.style.display = "none";
+        brandFallbackEl.style.display = "block";
+      };
+
+      fullscreenBtn.addEventListener("click", function () {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(function () {});
+          return;
+        }
+        document.exitFullscreen().catch(function () {});
+      });
+
       render(readState());
+      updateClock();
+      window.setInterval(updateClock, 1000);
 
       if ("BroadcastChannel" in window) {
         const channel = new BroadcastChannel(CHANNEL_NAME);
@@ -178,6 +386,10 @@
 
       window.addEventListener("storage", function (event) {
         if (event.key !== STORAGE_STATE_KEY) return;
+        render(readState());
+      });
+
+      window.addEventListener("resize", function () {
         render(readState());
       });
     })();
