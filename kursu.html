@@ -96,14 +96,14 @@
     .marquee {
       display: inline-block;
       white-space: nowrap;
-      padding-left: 100%;
-      animation: ticker 18s linear infinite;
+      transform: translateX(100vw);
+      animation: ticker 22s linear infinite;
       font-size: clamp(22px, 2vw, 34px);
       font-weight: 700;
     }
 
     @keyframes ticker {
-      0% { transform: translateX(0); }
+      0% { transform: translateX(100vw); }
       100% { transform: translateX(-100%); }
     }
   </style>
