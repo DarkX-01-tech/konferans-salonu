@@ -60,9 +60,22 @@
     if (s.sempozyum) parts.push(s.sempozyum);
     if (s.duyuru) parts.push(s.duyuru);
     const ticker = document.getElementById('ticker');
-    ticker.innerHTML = parts.length
-      ? parts.map(p => `<span>${p}</span>`).join('<span class="sep">◆</span>')
-      : '&nbsp;';
+    ticker.innerHTML = '';
+    if (parts.length) {
+      parts.forEach((p, i) => {
+        if (i > 0) {
+          const sep = document.createElement('span');
+          sep.className = 'sep';
+          sep.textContent = '◆';
+          ticker.appendChild(sep);
+        }
+        const span = document.createElement('span');
+        span.textContent = p;
+        ticker.appendChild(span);
+      });
+    } else {
+      ticker.innerHTML = '&nbsp;';
+    }
   }
 
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
