@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Konferans Salonu - Yönetici</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --border: #dfe5ef;
+      --text: #1f2d3d;
+      --muted: #637083;
+      --green: #17a34a;
+      --purple: #7d4cff;
+      --gray: #7f8a9b;
+      --orange: #f09b1a;
+      --red: #d94141;
+      --blue: #2c7be5;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 16px 24px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 6px 16px rgba(20, 32, 62, 0.06);
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: 28px;
+    }
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 700;
+      color: #2f3a4a;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 8px;
+      border: 1px solid #c9d2e1;
+      font-size: 16px;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .btn-purple { background: var(--purple); }
+    .btn-gray { background: var(--gray); }
+    .btn-green {
+      background: var(--green);
+      width: 100%;
+      margin-top: 14px;
+      padding: 14px;
+      font-size: 18px;
+      border-radius: 10px;
+    }
+
+    .lists {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .list-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      min-height: 180px;
+    }
+
+    .list-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .add-btn {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border-radius: 50%;
+      background: var(--blue);
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .items {
+      display: grid;
+      gap: 8px;
+    }
+
+    .item {
+      border: 1px solid #d3dbea;
+      border-radius: 8px;
+      padding: 8px;
+      background: #fbfdff;
+    }
+
+    .item-text {
+      font-size: 14px;
+      color: #2f3a4a;
+      word-break: break-word;
+      margin-bottom: 8px;
+    }
+
+    .item-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-select {
+      background: var(--orange);
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+
+    .btn-delete {
+      background: var(--red);
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 13px;
+      padding-top: 4px;
+    }
+
+    @media (max-width: 980px) {
+      .lists { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 600px) {
+      .lists { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="panel">
+      <h1>Yönetici Ekranı</h1>
+
+      <div class="field">
+        <label for="speakerInput">Konuşmacı</label>
+        <input id="speakerInput" type="text" placeholder="İsim soyisim..." />
+      </div>
+
+      <div class="field">
+        <label for="symposiumInput">Sempozyum [ALT YAZI]</label>
+        <input id="symposiumInput" type="text" placeholder="Sempozyum adı..." />
+      </div>
+
+      <div class="field">
+        <label for="topicInput">Toplantı Konusu [ÜST YAZI]</label>
+        <input id="topicInput" type="text" placeholder="Konu başlığı..." />
+      </div>
+
+      <div class="field">
+        <label for="tickerInput">Alt Yazı / Duyuru</label>
+        <input id="tickerInput" type="text" placeholder="Kayan metin mesajı..." />
+      </div>
+
+      <div class="row">
+        <button class="btn-purple" id="publishTickerBtn" type="button">YAYINLA</button>
+        <button class="btn-gray" id="clearTickerBtn" type="button">KALDIR</button>
+      </div>
+
+      <button class="btn-green" id="sendLiveBtn" type="button">CANLI YAYINA GÖNDER</button>
+    </section>
+
+    <section class="lists">
+      <article class="list-card">
+        <div class="list-head">
+          <span>Konuşmacılar</span>
+          <button class="add-btn" data-list="speakers" type="button">+</button>
+        </div>
+        <div class="items" id="speakersList"></div>
+      </article>
+
+      <article class="list-card">
+        <div class="list-head">
+          <span>Sempozyumlar</span>
+          <button class="add-btn" data-list="symposiums" type="button">+</button>
+        </div>
+        <div class="items" id="symposiumsList"></div>
+      </article>
+
+      <article class="list-card">
+        <div class="list-head">
+          <span>Konular</span>
+          <button class="add-btn" data-list="topics" type="button">+</button>
+        </div>
+        <div class="items" id="topicsList"></div>
+      </article>
+
+      <article class="list-card">
+        <div class="list-head">
+          <span>Duyurular</span>
+          <button class="add-btn" data-list="announcements" type="button">+</button>
+        </div>
+        <div class="items" id="announcementsList"></div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const STORAGE_STATE_KEY = "konferans_state";
+      const STORAGE_LISTS_KEY = "konferans_lists";
+      const CHANNEL_NAME = "konferans_channel";
+
+      const defaultState = {
+        speaker: "",
+        symposium: "",
+        topic: "",
+        ticker: ""
+      };
+
+      const defaultLists = {
+        speakers: [],
+        symposiums: [],
+        topics: [],
+        announcements: []
+      };
+
+      const fieldMap = {
+        speakers: "speakerInput",
+        symposiums: "symposiumInput",
+        topics: "topicInput",
+        announcements: "tickerInput"
+      };
+
+      function readJson(key, fallback) {
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) return fallback;
+          const parsed = JSON.parse(raw);
+          return { ...fallback, ...parsed };
+        } catch (_) {
+          return fallback;
+        }
+      }
+
+      let state = readJson(STORAGE_STATE_KEY, defaultState);
+      let lists = readJson(STORAGE_LISTS_KEY, defaultLists);
+
+      const channel = "BroadcastChannel" in window ? new BroadcastChannel(CHANNEL_NAME) : null;
+
+      const speakerInput = document.getElementById("speakerInput");
+      const symposiumInput = document.getElementById("symposiumInput");
+      const topicInput = document.getElementById("topicInput");
+      const tickerInput = document.getElementById("tickerInput");
+
+      function saveState(nextState) {
+        state = { ...defaultState, ...nextState };
+        localStorage.setItem(STORAGE_STATE_KEY, JSON.stringify(state));
+        if (channel) {
+          channel.postMessage({ type: "state_update", payload: state });
+        }
+      }
+
+      function saveLists() {
+        localStorage.setItem(STORAGE_LISTS_KEY, JSON.stringify(lists));
+      }
+
+      function fillFormFromState() {
+        speakerInput.value = state.speaker || "";
+        symposiumInput.value = state.symposium || "";
+        topicInput.value = state.topic || "";
+        tickerInput.value = state.ticker || "";
+      }
+
+      function createItemElement(listName, value, index) {
+        const wrap = document.createElement("div");
+        wrap.className = "item";
+
+        const text = document.createElement("div");
+        text.className = "item-text";
+        text.textContent = value;
+        wrap.appendChild(text);
+
+        const actions = document.createElement("div");
+        actions.className = "item-actions";
+
+        const selectBtn = document.createElement("button");
+        selectBtn.type = "button";
+        selectBtn.className = "btn-select";
+        selectBtn.textContent = "SEÇ";
+        selectBtn.addEventListener("click", function () {
+          const inputId = fieldMap[listName];
+          const target = document.getElementById(inputId);
+          target.value = value;
+        });
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.type = "button";
+        deleteBtn.className = "btn-delete";
+        deleteBtn.textContent = "sil";
+        deleteBtn.addEventListener("click", function () {
+          lists[listName].splice(index, 1);
+          saveLists();
+          renderLists();
+        });
+
+        actions.appendChild(selectBtn);
+        actions.appendChild(deleteBtn);
+        wrap.appendChild(actions);
+        return wrap;
+      }
+
+      function renderList(listName) {
+        const container = document.getElementById(listName + "List");
+        container.innerHTML = "";
+        const items = lists[listName] || [];
+
+        if (!items.length) {
+          const empty = document.createElement("div");
+          empty.className = "empty";
+          empty.textContent = "Kayıt yok";
+          container.appendChild(empty);
+          return;
+        }
+
+        items.forEach(function (item, index) {
+          container.appendChild(createItemElement(listName, item, index));
+        });
+      }
+
+      function renderLists() {
+        renderList("speakers");
+        renderList("symposiums");
+        renderList("topics");
+        renderList("announcements");
+      }
+
+      function addListItem(listName) {
+        const value = (window.prompt("Yeni kayıt girin:") || "").trim();
+        if (!value) return;
+        lists[listName].push(value);
+        saveLists();
+        renderLists();
+      }
+
+      document.querySelectorAll(".add-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          addListItem(btn.dataset.list);
+        });
+      });
+
+      document.getElementById("publishTickerBtn").addEventListener("click", function () {
+        saveState({
+          ...state,
+          ticker: tickerInput.value.trim()
+        });
+      });
+
+      document.getElementById("clearTickerBtn").addEventListener("click", function () {
+        tickerInput.value = "";
+        saveState({
+          ...state,
+          ticker: ""
+        });
+      });
+
+      document.getElementById("sendLiveBtn").addEventListener("click", function () {
+        saveState({
+          speaker: speakerInput.value.trim(),
+          symposium: symposiumInput.value.trim(),
+          topic: topicInput.value.trim(),
+          ticker: tickerInput.value.trim()
+        });
+      });
+
+      window.addEventListener("storage", function (event) {
+        if (event.key !== STORAGE_STATE_KEY || !event.newValue) return;
+        try {
+          state = { ...defaultState, ...JSON.parse(event.newValue) };
+          fillFormFromState();
+        } catch (_) {}
+      });
+
+      fillFormFromState();
+      renderLists();
+      saveLists();
+    })();
+  </script>
+</body>
+</html>
