@@ -6,127 +6,223 @@
   <title>Konferans Salonu - Kürsü Ekranı</title>
   <style>
     :root {
-      --red: #cc2029;
-      --text: #1b2736;
-      --muted: #4c5b6c;
+      --bg: #ffffff;
+      --text: #142338;
+      --muted: #60758e;
+      --red: #c91f29;
+      --red-dark: #a9141f;
     }
 
     * { box-sizing: border-box; }
+
+    html, body { width: 100%; height: 100%; }
+
     body {
       margin: 0;
-      min-height: 100vh;
-      font-family: Arial, sans-serif;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
       color: var(--text);
-      background: #fff;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
+    }
+
+    .stage {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      position: relative;
     }
 
     .header {
+      min-height: 160px;
+      padding: 20px 26px 14px;
+      border-bottom: 1px solid #e5ebf3;
       display: flex;
       align-items: center;
-      gap: 22px;
-      padding: 24px 30px 16px;
-      border-bottom: 1px solid #ebedf2;
+      justify-content: center;
+      position: relative;
+    }
+
+    .logo-wrap {
+      width: min(92vw, 1200px);
+      display: grid;
+      place-items: center;
     }
 
     .logo {
-      width: 110px;
-      height: 110px;
+      max-width: min(92vw, 1120px);
+      width: auto;
+      max-height: clamp(110px, 15vh, 140px);
       object-fit: contain;
-      flex: 0 0 auto;
+      display: none;
     }
 
-    .titles {
-      line-height: 1.3;
+    .fallback-titles {
+      text-align: center;
+      line-height: 1.25;
     }
 
-    .titles .line1 {
-      font-size: clamp(22px, 2.4vw, 42px);
+    .fallback-titles .line1 {
+      font-size: clamp(20px, 2.2vw, 38px);
+      font-weight: 900;
+      letter-spacing: .5px;
+      color: #c82028;
+    }
+
+    .fallback-titles .line2,
+    .fallback-titles .line3 {
+      font-size: clamp(16px, 1.7vw, 28px);
       font-weight: 800;
-      letter-spacing: .4px;
+      color: #5c6f87;
     }
 
-    .titles .line2,
-    .titles .line3 {
-      font-size: clamp(18px, 1.7vw, 30px);
-      color: var(--muted);
+    .fullscreen-btn {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      border: 0;
+      background: rgba(20, 35, 56, .08);
+      color: #243a56;
+      font-size: 13px;
       font-weight: 700;
+      border-radius: 10px;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: .15s ease;
+    }
+
+    .fullscreen-btn:hover {
+      background: rgba(20, 35, 56, .14);
+      transform: translateY(-1px);
     }
 
     .center {
       flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      min-height: 0;
+      display: grid;
+      place-items: center;
       text-align: center;
-      padding: 24px 32px;
+      padding: 18px 32px;
     }
 
     .content {
-      max-width: 95vw;
+      width: min(94vw, 1800px);
+      opacity: 1;
+      transition: opacity .35s ease;
+    }
+
+    .content.refresh {
+      opacity: .4;
     }
 
     .topic {
       margin: 0 0 24px;
-      font-size: clamp(36px, 5vw, 90px);
-      font-weight: 800;
+      font-size: clamp(54px, 6.2vw, 122px);
+      font-weight: 900;
+      color: #213b5a;
       text-transform: uppercase;
-      color: #24364f;
+      letter-spacing: .2px;
+      line-height: 1.1;
+      word-break: break-word;
     }
 
     .speaker {
       margin: 0;
-      font-size: clamp(34px, 7vw, 108px);
+      font-size: clamp(60px, 8.6vw, 158px);
       font-weight: 900;
-      color: #161f2c;
+      color: #102033;
       text-transform: uppercase;
+      letter-spacing: .4px;
+      line-height: 1.05;
+      word-break: break-word;
     }
 
-    .bottom {
+    .waiting {
+      font-size: clamp(28px, 3vw, 52px);
+      color: #8597ad;
+      font-weight: 700;
+      letter-spacing: .3px;
+      margin: 0;
+    }
+
+    .ticker {
+      min-height: 84px;
       background: var(--red);
       color: #fff;
-      height: 86px;
+      border-top: 4px solid var(--red-dark);
+      overflow: hidden;
       display: flex;
       align-items: center;
-      overflow: hidden;
-      border-top: 4px solid #b11622;
     }
 
-    .marquee {
-      display: inline-block;
+    .ticker.hidden {
+      display: none;
+    }
+
+    .ticker-track {
+      display: flex;
+      width: max-content;
       white-space: nowrap;
-      transform: translateX(100vw);
-      animation: ticker 22s linear infinite;
-      font-size: clamp(22px, 2vw, 34px);
-      font-weight: 700;
+      padding-left: 100%;
+      animation: tickerScroll var(--ticker-duration, 24s) linear infinite;
     }
 
-    @keyframes ticker {
-      0% { transform: translateX(100vw); }
-      100% { transform: translateX(-100%); }
+    .ticker-text {
+      font-size: clamp(24px, 2.4vw, 42px);
+      font-weight: 800;
+      padding-right: 80px;
+    }
+
+    @keyframes tickerScroll {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    body.waiting-mode .topic,
+    body.waiting-mode .speaker { display: none; }
+
+    body.waiting-mode .waiting { display: block; }
+
+    .waiting { display: none; }
+
+    @media (max-width: 900px) {
+      .header { min-height: 130px; padding-right: 12px; padding-left: 12px; }
+      .fullscreen-btn { right: 10px; top: 10px; }
+      .center { padding-left: 12px; padding-right: 12px; }
+      .ticker { min-height: 66px; }
     }
   </style>
 </head>
-<body>
-  <header class="header">
-    <img id="logo" class="logo" src="logo.png" alt="Logo" onerror="this.style.display='none'" />
-    <div class="titles">
-      <div class="line1">T.C. SAĞLIK BAKANLIĞI</div>
-      <div class="line2">İSTANBUL İL SAĞLIK MÜDÜRLÜĞÜ</div>
-      <div class="line3">Marmara Üniversitesi Pendik Eğitim ve Araştırma Hastanesi</div>
-    </div>
-  </header>
+<body class="waiting-mode">
+  <main class="stage">
+    <header class="header">
+      <button id="fullscreenBtn" class="fullscreen-btn" type="button">Tam Ekran</button>
+      <div class="logo-wrap">
+        <img id="logo" class="logo" src="img/hastane.png" alt="Kurum Logosu" />
+        <div id="fallbackTitles" class="fallback-titles">
+          <div class="line1">T.C. SAĞLIK BAKANLIĞI</div>
+          <div class="line2">İSTANBUL İL SAĞLIK MÜDÜRLÜĞÜ</div>
+          <div class="line3">Marmara Üniversitesi Pendik Eğitim ve Araştırma Hastanesi</div>
+        </div>
+      </div>
+    </header>
 
-  <main class="center">
-    <div class="content">
-      <h1 id="topic" class="topic"></h1>
-      <h2 id="speaker" class="speaker"></h2>
-    </div>
+    <section class="center">
+      <div id="content" class="content">
+        <h1 id="topic" class="topic"></h1>
+        <h2 id="speaker" class="speaker"></h2>
+        <p id="waiting" class="waiting">Yayın bekleniyor</p>
+      </div>
+    </section>
   </main>
 
-  <footer class="bottom">
-    <div id="marquee" class="marquee"></div>
+  <footer id="tickerBar" class="ticker hidden" aria-live="polite">
+    <div id="tickerTrack" class="ticker-track">
+      <span id="tickerTextA" class="ticker-text"></span>
+      <span id="tickerTextB" class="ticker-text"></span>
+    </div>
   </footer>
 
   <script>
@@ -141,30 +237,110 @@
         ticker: ""
       };
 
+      const logoEl = document.getElementById("logo");
+      const fallbackTitlesEl = document.getElementById("fallbackTitles");
+      const contentEl = document.getElementById("content");
       const topicEl = document.getElementById("topic");
       const speakerEl = document.getElementById("speaker");
-      const marqueeEl = document.getElementById("marquee");
+      const tickerBarEl = document.getElementById("tickerBar");
+      const tickerTrackEl = document.getElementById("tickerTrack");
+      const tickerTextAEl = document.getElementById("tickerTextA");
+      const tickerTextBEl = document.getElementById("tickerTextB");
+      const fullscreenBtn = document.getElementById("fullscreenBtn");
+
+      function sanitizeState(candidate) {
+        return {
+          speaker: typeof candidate.speaker === "string" ? candidate.speaker : "",
+          symposium: typeof candidate.symposium === "string" ? candidate.symposium : "",
+          topic: typeof candidate.topic === "string" ? candidate.topic : "",
+          ticker: typeof candidate.ticker === "string" ? candidate.ticker : ""
+        };
+      }
 
       function readState() {
         try {
           const raw = localStorage.getItem(STORAGE_STATE_KEY);
           if (!raw) return { ...defaultState };
-          return { ...defaultState, ...JSON.parse(raw) };
+          return sanitizeState({ ...defaultState, ...JSON.parse(raw) });
         } catch (_) {
           return { ...defaultState };
         }
       }
 
-      function render(state) {
-        topicEl.textContent = state.topic || "";
-        speakerEl.textContent = state.speaker || "";
-
-        const barText = [state.symposium, state.ticker].filter(Boolean).join(" / ");
-        marqueeEl.textContent = barText || "";
-        marqueeEl.style.animation = "none";
-        void marqueeEl.offsetWidth;
-        marqueeEl.style.animation = "";
+      function hasAnyContent(state) {
+        return Boolean(state.speaker || state.topic || state.symposium || state.ticker);
       }
+
+      function fitText(el, value, maxSize, minSize, ratio) {
+        el.style.fontSize = "";
+        const length = value.length;
+        if (!length) return;
+        const target = Math.max(minSize, Math.min(maxSize, Math.floor((ratio / length) * 10) + minSize));
+        el.style.fontSize = target + "px";
+      }
+
+      function renderTicker(state) {
+        const tickerText = [state.symposium, state.ticker].filter(Boolean).join(" / ");
+        if (!tickerText) {
+          tickerBarEl.classList.add("hidden");
+          tickerTextAEl.textContent = "";
+          tickerTextBEl.textContent = "";
+          return;
+        }
+
+        const padded = tickerText + "   •   ";
+        tickerTextAEl.textContent = padded;
+        tickerTextBEl.textContent = padded;
+        tickerBarEl.classList.remove("hidden");
+
+        const duration = Math.max(16, Math.min(48, Math.round(padded.length * 0.55)));
+        tickerTrackEl.style.setProperty("--ticker-duration", duration + "s");
+
+        tickerTrackEl.style.animation = "none";
+        void tickerTrackEl.offsetWidth;
+        tickerTrackEl.style.animation = "";
+      }
+
+      function render(state) {
+        contentEl.classList.add("refresh");
+
+        window.setTimeout(function () {
+          topicEl.textContent = state.topic || "";
+          speakerEl.textContent = state.speaker || "";
+
+          fitText(topicEl, state.topic || "", 122, 44, 1000);
+          fitText(speakerEl, state.speaker || "", 158, 52, 1320);
+
+          renderTicker(state);
+          document.body.classList.toggle("waiting-mode", !hasAnyContent(state));
+          contentEl.classList.remove("refresh");
+        }, 70);
+      }
+
+      function updateLogoVisibility() {
+        const hasLogo = logoEl.complete && logoEl.naturalWidth > 0;
+        logoEl.style.display = hasLogo ? "block" : "none";
+        fallbackTitlesEl.style.display = hasLogo ? "none" : "block";
+      }
+
+      function enterFullscreen() {
+        const root = document.documentElement;
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(function () {});
+          return;
+        }
+        root.requestFullscreen().catch(function () {});
+      }
+
+      fullscreenBtn.addEventListener("click", enterFullscreen);
+
+      document.addEventListener("fullscreenchange", function () {
+        fullscreenBtn.textContent = document.fullscreenElement ? "Tam Ekrandan Çık" : "Tam Ekran";
+      });
+
+      logoEl.addEventListener("load", updateLogoVisibility);
+      logoEl.addEventListener("error", updateLogoVisibility);
+      updateLogoVisibility();
 
       render(readState());
 
@@ -172,7 +348,7 @@
         const channel = new BroadcastChannel(CHANNEL_NAME);
         channel.addEventListener("message", function (event) {
           if (!event.data || event.data.type !== "state_update") return;
-          render({ ...defaultState, ...event.data.payload });
+          render(sanitizeState(event.data.payload || defaultState));
         });
       }
 
