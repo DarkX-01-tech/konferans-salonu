@@ -16,7 +16,11 @@ function readData() {
   try {
     return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
   } catch (e) {
-    return JSON.parse(JSON.stringify(DEFAULT_DATA));
+    if (e.code === 'ENOENT') {
+      return JSON.parse(JSON.stringify(DEFAULT_DATA));
+    }
+    console.error('data.json okunamadı:', e.message);
+    throw e;
   }
 }
 

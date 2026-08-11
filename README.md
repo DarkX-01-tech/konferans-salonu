@@ -19,11 +19,11 @@ Sunucu **port 3000**'de çalışır.
 
 | Ekran | Adres |
 |-------|-------|
-| Yönetim Paneli | http://10.201.65.10:3000/yonet.html |
-| Kürsü Monitörü (salona bakan büyük ekran) | http://10.201.65.10:3000/ |
-| Konuşmacı Ekranı (kürsü önü) | http://10.201.65.10:3000/kursu.html |
+| Yönetim Paneli | http://`<SERVER_IP>`:3000/yonet.html |
+| Kürsü Monitörü (salona bakan büyük ekran) | http://`<SERVER_IP>`:3000/ |
+| Konuşmacı Ekranı (kürsü önü) | http://`<SERVER_IP>`:3000/kursu.html |
 
-IIS reverse proxy varsa (bkz. aşağı): `http://10.201.65.10/` (port olmadan da erişilebilir.
+IIS reverse proxy varsa (bkz. aşağı), `http://<SERVER_IP>/` şeklinde port olmadan da erişilebilir.
 
 ## Logo
 

@@ -109,14 +109,29 @@ function renderListeler(listeler) {
         <input type="text" id="yeni_${tip}" placeholder="Yeni ekle...">
         <button onclick="listEkle('${tip}')">+</button>
       </div>
-      <div id="liste_${tip}">
-        ${ogeler.map(v => `
-          <div class="liste-oge">
-            <span title="${v}">${v}</span>
-            <button class="btn-sec" onclick="sec('${tip}', \`${v.replace(/`/g,'\\`')}\`)">SEÇ</button>
-            <button class="btn-sil" onclick="listSil('${tip}', \`${v.replace(/`/g,'\\`')}\`)">sil</button>
-          </div>`).join('')}
-      </div>`;
+      <div id="liste_${tip}"></div>`;
+
+    const listeDiv = kart.querySelector('#liste_' + tip);
+    ogeler.forEach(v => {
+      const oge = document.createElement('div');
+      oge.className = 'liste-oge';
+      const span = document.createElement('span');
+      span.title = v;
+      span.textContent = v;
+      const btnSec = document.createElement('button');
+      btnSec.className = 'btn-sec';
+      btnSec.textContent = 'SEÇ';
+      btnSec.addEventListener('click', () => sec(tip, v));
+      const btnSil = document.createElement('button');
+      btnSil.className = 'btn-sil';
+      btnSil.textContent = 'sil';
+      btnSil.addEventListener('click', () => listSil(tip, v));
+      oge.appendChild(span);
+      oge.appendChild(btnSec);
+      oge.appendChild(btnSil);
+      listeDiv.appendChild(oge);
+    });
+
     el.appendChild(kart);
   });
 }
