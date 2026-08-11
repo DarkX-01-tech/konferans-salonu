@@ -523,7 +523,6 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     if (channel) channel.postMessage({ type: "state_update", payload: state });
     updateStatusBadge();
-    refreshPreview();
   }
 
   /* Formu mevcut state'ten doldur */
@@ -613,14 +612,6 @@
     var scale = w / 1280;
     frame.style.transform = "scale(" + scale + ")";
     /* wrapper yüksekliği 16:9 (padding-bottom:%56.25) ile ayarlı */
-  }
-
-  /* Preview yenile (state değişince) */
-  function refreshPreview() {
-    var frame = document.getElementById("previewFrame");
-    /* Aynı sayfayı yeniden yüklemek yerine sadece storage güncelleniyor;
-       BroadcastChannel iframe içinde de çalışır */
-    try { frame.contentWindow.location.reload(); } catch(_) {}
   }
 
   /* Pencere boyutu değişince scale'i güncelle */
@@ -740,8 +731,7 @@
     if (timerSeconds > 0) {
       timerSeconds--;
       updateTimerDisplay();
-    }
-    if (timerSeconds <= 0) {
+    } else {
       clearInterval(timerInterval);
       timerInterval = null;
       timerRunning  = false;
