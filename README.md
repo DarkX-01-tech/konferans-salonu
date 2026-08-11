@@ -1,40 +1,64 @@
 # Konferans Salonu (Sunucusuz Statik Yapı)
 
-Bu proje, **Node.js / port / WebSocket gerektirmeden** çalışan, IIS altında servis edilen saf statik bir konferans salonu kürsü ekran sistemidir.
+Bu proje, **Node.js / port / WebSocket gerektirmeden** IIS altında çalışan saf statik konferans yönetim ekranıdır.
 
 ## Dosyalar
 
-- `yonet.html` → Yönetici Ekranı
-- `kursu.html` → Kürsü Ekranı (seyircinin gördüğü büyük ekran)
+- `yonet.html` → Yönetim paneli
+- `kursu.html` → Kürsü / seyirci ekranı
 
 ## Kurulum (IIS)
 
-1. Bu repodaki dosyaları şu klasöre kopyalayın:
+1. Dosyaları şu klasöre kopyalayın:
    - `C:\inetpub\wwwroot\Admin\konferans_salonu\`
-2. Ek kurulum gerekmez.
-   - Node.js gerekmez
-   - Port ayarı gerekmez
-   - Sunucu tarafı uygulama gerekmez
-
-## Erişim Adresleri
-
-- Yönetici Ekranı: `http://10.201.65.10/Admin/konferans_salonu/yonet.html`
-- Kürsü Ekranı: `http://10.201.65.10/Admin/konferans_salonu/kursu.html`
+2. Yönetim ve kürsü ekranını aynı bilgisayarda/ağda HTTP ile açın:
+   - `http://10.201.65.10/Admin/konferans_salonu/yonet.html`
+   - `http://10.201.65.10/Admin/konferans_salonu/kursu.html`
 
 ## Kullanım
 
-1. Yönetici ve Kürsü ekranlarını **aynı bilgisayarda, aynı tarayıcıda** (farklı sekme/pencere) açın.
-2. Yönetici ekranında konuşmacı, sempozyum, konu ve duyuru bilgilerini girin.
-3. `CANLI YAYINA GÖNDER` ile kürsü ekranını anında güncelleyin.
-4. Alt yazı/duyuru satırı için `YAYINLA` ve `KALDIR` butonlarını kullanın.
+> **Önemli:** Senkronizasyon için iki ekran aynı bilgisayarda ve aynı tarayıcıda açık olmalıdır (farklı sekme/pencere olabilir).
 
-## Logo Notu
+### Yönetim paneli butonları
 
-- Kürsü ekranı `logo.png` dosyasını kök klasörden yüklemeyi dener.
-- Logo kullanmak için `logo.png` dosyasını aynı klasöre ekleyin.
-- Dosya yoksa ekran bozulmaz; logo otomatik gizlenir.
+- **CANLI YAYINA GÖNDER**
+  - Formdaki tüm alanları (`konuşmacı`, `sempozyum`, `konu`, `alt yazı/duyuru`) kürsü ekranına yayınlar.
+  - Kısayol: `Ctrl + Enter`
+
+- **Duyuruyu Yayınla**
+  - Sadece `Alt Yazı / Duyuru` alanını canlı olarak günceller.
+
+- **KALDIR**
+  - Sadece `Alt Yazı / Duyuru` alanını temizler ve kürsü alt banttan kaldırır.
+
+- **TÜMÜNÜ KALDIR**
+  - Tüm yayını durdurur; kürsü ekranını bekleme durumuna döndürür.
+
+### Yönetim paneli özellikleri
+
+- Form değiştikçe anlık **Canlı Önizleme** (TASLAK / YAYINDA rozeti).
+- Üst barda yayın durumu göstergesi: `Yayın: AKTİF` / `Yayın: BOŞ`.
+- `Kürsü Ekranını Aç` butonu ile `kursu.html` yeni sekmede açılır.
+- Konuşmacılar/Sempozyumlar/Konular/Duyurular listeleri:
+  - Inline input + **EKLE**
+  - **SEÇ** ile formu doldurma
+  - **SİL** ile silme
+  - Çift tıkla hızlı düzenleme
+  - Kalıcılık: `localStorage` (`konferans_lists`)
+
+### Kürsü ekranı özellikleri
+
+- Logo yolu: **`img/hastane.png`**
+  - Logo varsa üstte logo gösterilir.
+  - Logo yoksa metinsel başlıklar fallback olarak görünür.
+- Büyük ekran uyumlu tipografi, otomatik metin küçültme.
+- Alt kırmızı bantta kesintisiz kayan yazı (içerik boşsa bant gizlenir).
+- Boş yayında zarif bekleme durumu (`Yayın bekleniyor`).
+- Köşede **Tam Ekran** butonu (ikinci monitörde fullscreen kullanım için idealdir; F11 de kullanılabilir).
 
 ## Teknik Not
 
-Senkronizasyon, aynı tarayıcı ve aynı bilgisayar senaryosu için `BroadcastChannel` + `localStorage` (`storage` event yedeği) ile çalışır.
-Farklı cihazlar arası gerçek zamanlı senkron için ileride sunucu tarafı bir çözüm gerekir.
+- Durum anahtarı: `konferans_state` = `{ speaker, symposium, topic, ticker }`
+- Liste anahtarı: `konferans_lists` = `{ speakers, symposiums, topics, announcements }`
+- Senkronizasyon: `BroadcastChannel('konferans_channel')` + `localStorage` `storage` event.
+- Mesaj türü: `state_update`, payload: state.
