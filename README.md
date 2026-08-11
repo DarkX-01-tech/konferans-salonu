@@ -30,9 +30,14 @@ Bu proje, **Node.js / port / WebSocket gerektirmeden** çalışan, IIS altında 
 
 ## Logo Notu
 
-- Kürsü ekranı `logo.png` dosyasını kök klasörden yüklemeyi dener.
-- Logo kullanmak için `logo.png` dosyasını aynı klasöre ekleyin.
+- Kürsü ekranı logoyu `img/hastane.png` yolundan yükler.
+- Logo kullanmak için `img/hastane.png` dosyasını aynı klasör yapısında koruyun.
 - Dosya yoksa ekran bozulmaz; logo otomatik gizlenir.
+
+## Kürsü Görünümü
+
+- Kürsü içerik alanı konu ve konuşmacıyı sola yaslı, üst-orta bölgede gösterir.
+- Konu kırmızı üst etiket olarak, konuşmacı adı ise daha büyük ve koyu ana vurgu olarak gösterilir.
 
 ## Teknik Not
 
