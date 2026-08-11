@@ -21,7 +21,10 @@
       min-height: 100vh;
       font-family: Arial, sans-serif;
       color: var(--text);
-      background: var(--bg);
+      background:
+        radial-gradient(1200px 600px at 85% -10%, #eef2fb 0%, rgba(238,242,251,0) 60%),
+        radial-gradient(900px 500px at 0% 110%, #f4f7fd 0%, rgba(244,247,253,0) 55%),
+        #ffffff;
       display: flex;
       flex-direction: column;
     }
@@ -47,21 +50,42 @@
       flex: 0 0 auto;
     }
 
-    /* Sağ üst köşe: saat + tarih */
+    /* Sağ üst köşe: saat + tarih — glass kart */
     .clock-wrap {
-      text-align: right;
       flex: 0 0 auto;
-      line-height: 1.2;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      padding: 12px 20px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 8px 24px rgba(20, 32, 62, 0.10);
+      -webkit-backdrop-filter: blur(12px) saturate(140%);
+      backdrop-filter: blur(12px) saturate(140%);
     }
     .clock-time {
-      font-size: clamp(22px, 2.2vw, 38px);
-      font-weight: 800;
+      font-size: clamp(26px, 2.6vw, 46px);
+      font-weight: 900;
       color: var(--text);
+      letter-spacing: 2px;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .clock-seconds {
+      font-size: clamp(14px, 1.3vw, 22px);
+      font-weight: 700;
+      color: var(--red);
     }
     .clock-date {
-      font-size: clamp(13px, 1.2vw, 20px);
+      font-size: clamp(12px, 1.1vw, 18px);
       color: var(--muted);
-      font-weight: 600;
+      font-weight: 700;
+      text-transform: capitalize;
     }
 
     /* ── Orta alan ─────────────────────────────────────────── */
@@ -74,11 +98,12 @@
       padding: 28px 40px;
     }
 
-    /* Glassmorphism cam kart */
+    /* Glassmorphism cam kart — konuşmacı adına göre yatayda genişler */
     .content {
-      max-width: min(1400px, 92vw);
-      width: 100%;
-      padding: clamp(28px, 4vw, 64px) clamp(24px, 5vw, 72px);
+      display: inline-block;
+      width: max-content;
+      max-width: 96vw;
+      padding: clamp(28px, 4vw, 64px) clamp(32px, 5vw, 80px);
       background: rgba(255, 255, 255, 0.55);
       border: 1px solid rgba(255, 255, 255, 0.75);
       border-radius: 26px;
@@ -115,7 +140,7 @@
       line-height: 1.15;
     }
 
-    /* Konuşmacı – alt, en büyük */
+    /* Konuşmacı – alt, en büyük, TEK SATIR (kırılmaz) */
     .speaker {
       margin: 0;
       font-size: clamp(40px, 5.5vw, 96px);
@@ -123,6 +148,7 @@
       color: var(--text);
       text-transform: uppercase;
       line-height: 1.05;
+      white-space: nowrap;
     }
 
     /* ── Bekleme modu ──────────────────────────────────────── */
@@ -140,6 +166,7 @@
       font-weight: 800;
       color: var(--muted);
       animation: pulse 2.4s ease-in-out infinite;
+      max-width: 92vw;
     }
 
     @keyframes pulse {
@@ -182,14 +209,16 @@
     <img id="logo" class="logo" src="img/hastane.png" alt="Hastane Logosu"
          onerror="this.style.display='none'" />
     <div class="clock-wrap">
-      <div class="clock-time" id="clockTime">--:--</div>
+      <div class="clock-time" id="clockTime">
+        <span id="clockHM">--:--</span><span class="clock-seconds" id="clockSec">00</span>
+      </div>
       <div class="clock-date" id="clockDate"></div>
     </div>
   </header>
 
   <!-- Bekleme modu (veri yokken görünür) -->
   <div class="waiting" id="waitingEl">
-    <div class="waiting-text">Yayın Bekleniyor…</div>
+    <div class="waiting-text" id="waitingText">Yayın Bekleniyor…</div>
   </div>
 
   <!-- Yayın içeriği (veri gelince görünür) -->
@@ -216,18 +245,21 @@
       var DEFAULT_TICKER =
         "S.B. Marmara Üniversitesi Pendik Eğitim ve Araştırma Hastanesi" +
         " \u2502 Prof. Dr. Işıl Barlan Konferans Salonu";
+      var DEFAULT_WAITING = "Yayın Bekleniyor…";
 
-      var defaultState = { speaker: "", symposium: "", topic: "", ticker: "" };
+      /* waiting: bekleme modunda gösterilecek özel mesaj (ör. "Toplantıya 15 Dakika Ara") */
+      var defaultState = { speaker: "", symposium: "", topic: "", ticker: "", waiting: "" };
 
       /* ── DOM referansları ────────────────────────────────── */
-      var waitingEl  = document.getElementById("waitingEl");
-      var contentEl  = document.getElementById("contentEl");
+      var waitingEl   = document.getElementById("waitingEl");
+      var waitingText = document.getElementById("waitingText");
+      var contentEl   = document.getElementById("contentEl");
       var symposiumEl = document.getElementById("symposiumEl");
-      var topicEl    = document.getElementById("topicEl");
-      var speakerEl  = document.getElementById("speakerEl");
-      var marqueeEl  = document.getElementById("marqueeEl");
-      var divTop     = document.getElementById("divTop");
-      var divBot     = document.getElementById("divBot");
+      var topicEl     = document.getElementById("topicEl");
+      var speakerEl   = document.getElementById("speakerEl");
+      var marqueeEl   = document.getElementById("marqueeEl");
+      var divTop      = document.getElementById("divTop");
+      var divBot      = document.getElementById("divBot");
 
       /* ── localStorage okuma ──────────────────────────────── */
       function readState() {
@@ -237,6 +269,21 @@
           return Object.assign({}, defaultState, JSON.parse(raw));
         } catch (_) {
           return Object.assign({}, defaultState);
+        }
+      }
+
+      /* ── Konuşmacı adını çerçeveye sığdır (tek satır) ─────── */
+      function fitSpeaker() {
+        if (!speakerEl.textContent) return;
+        speakerEl.style.fontSize = "";      /* clamp değerine dön */
+        var maxW = window.innerWidth * 0.90; /* ekranın %90'ı */
+        var size = parseFloat(getComputedStyle(speakerEl).fontSize);
+        var guard = 0;
+        /* Metin çok uzunsa taşmayı önlemek için fontu kademeli küçült */
+        while (speakerEl.scrollWidth > maxW && size > 24 && guard < 200) {
+          size -= 2;
+          speakerEl.style.fontSize = size + "px";
+          guard++;
         }
       }
 
@@ -251,6 +298,9 @@
         waitingEl.style.display  = hasContent ? "none"  : "flex";
         contentEl.style.display  = hasContent ? "flex"  : "none";
 
+        /* Bekleme mesajı: özel metin varsa onu, yoksa varsayılanı göster */
+        waitingText.textContent = state.waiting || DEFAULT_WAITING;
+
         /* Metinler (XSS güvenliği: textContent) */
         symposiumEl.textContent = state.symposium || "";
         topicEl.textContent     = state.topic     || "";
@@ -260,6 +310,9 @@
         symposiumEl.style.display = hasSymposium ? "" : "none";
         divTop.style.display      = hasSymposium ? "" : "none";
         divBot.style.display      = (hasTopic && hasSpeaker) ? "" : "none";
+
+        /* Konuşmacı adını tek satırda sığdır */
+        if (hasSpeaker) fitSpeaker();
 
         /* Alt bant: SADECE duyuru (ticker); yoksa kurumsal varsayılan metin.
            NOT: Sempozyum adı alt banta EKLENMEZ. */
@@ -271,8 +324,12 @@
         marqueeEl.style.animation = "";
       }
 
+      /* Pencere yeniden boyutlanınca konuşmacı adını yeniden sığdır */
+      window.addEventListener("resize", fitSpeaker);
+
       /* ── Canlı saat ──────────────────────────────────────── */
-      var clockTimeEl = document.getElementById("clockTime");
+      var clockHM  = document.getElementById("clockHM");
+      var clockSec = document.getElementById("clockSec");
       var clockDateEl = document.getElementById("clockDate");
       var TR_DAYS   = ["Pazar","Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi"];
       var TR_MONTHS = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran",
@@ -283,7 +340,8 @@
         var hh = String(now.getHours()).padStart(2, "0");
         var mm = String(now.getMinutes()).padStart(2, "0");
         var ss = String(now.getSeconds()).padStart(2, "0");
-        clockTimeEl.textContent = hh + ":" + mm + ":" + ss;
+        clockHM.textContent  = hh + ":" + mm;
+        clockSec.textContent = ss;
         clockDateEl.textContent =
           TR_DAYS[now.getDay()] + ", " +
           now.getDate() + " " +
@@ -300,10 +358,29 @@
       if ("BroadcastChannel" in window) {
         var ch = new BroadcastChannel(CHANNEL_NAME);
         ch.addEventListener("message", function (ev) {
-          if (!ev.data || ev.data.type !== "state_update") return;
-          render(Object.assign({}, defaultState, ev.data.payload));
+          if (!ev.data) return;
+          /* Durum güncellemesi */
+          if (ev.data.type === "state_update") {
+            render(Object.assign({}, defaultState, ev.data.payload));
+          }
+          /* Yönetici panelinden gelen tam ekran komutu */
+          if (ev.data.type === "toggle_fullscreen") {
+            toggleFullscreen();
+          }
         });
       }
+
+      /* ── Tam ekran ────────────────────────────────────────── */
+      function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          var el = document.documentElement;
+          if (el.requestFullscreen) el.requestFullscreen().catch(function(){});
+        } else {
+          if (document.exitFullscreen) document.exitFullscreen();
+        }
+      }
+      /* Kürsü ekranına tıklayınca da tam ekran (yedek yöntem) */
+      document.addEventListener("dblclick", toggleFullscreen);
 
       /* ── localStorage değişikliği (farklı sekme) ──────────── */
       window.addEventListener("storage", function (ev) {
