@@ -5,88 +5,138 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Konferans Salonu - Kürsü Ekranı</title>
   <style>
+    /* ===== Renk değişkenleri ===== */
     :root {
-      --red: #cc2029;
-      --text: #1b2736;
-      --muted: #4c5b6c;
+      --red:    #cc2029;
+      --text:   #1b2736;
+      --muted:  #4c5b6c;
+      --bg-start: #dde8f5;
+      --bg-end:   #eef3fa;
     }
 
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       min-height: 100vh;
       font-family: Arial, sans-serif;
       color: var(--text);
-      background: #fff;
+      /* Ferah degrade zemin — cam efektinin belli olması için */
+      background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
       display: flex;
       flex-direction: column;
     }
 
+    /* ===== HEADER (logo + kurum adı) ===== */
     .header {
       display: flex;
       align-items: center;
       gap: 22px;
-      padding: 24px 30px 16px;
-      border-bottom: 1px solid #ebedf2;
+      padding: 20px 32px 16px;
+      /* Hafif cam his */
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.7);
     }
 
     .logo {
-      width: 110px;
-      height: 110px;
+      /* Logo oranını koru; küçülüp bozulmasın */
+      width: auto;
+      height: 90px;
+      max-width: 180px;
       object-fit: contain;
       flex: 0 0 auto;
     }
 
-    .titles {
-      line-height: 1.3;
-    }
+    .titles { line-height: 1.35; }
 
     .titles .line1 {
-      font-size: clamp(22px, 2.4vw, 42px);
+      font-size: clamp(18px, 2vw, 34px);
       font-weight: 800;
-      letter-spacing: .4px;
+      letter-spacing: .3px;
     }
 
     .titles .line2,
     .titles .line3 {
-      font-size: clamp(18px, 1.7vw, 30px);
+      font-size: clamp(14px, 1.5vw, 26px);
       color: var(--muted);
       font-weight: 700;
     }
 
+    /* ===== ORTADAKI ANA ALAN ===== */
     .center {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 32px 24px;
+    }
+
+    /* ===== BEKLEME MODU (yayın yokken) ===== */
+    .waiting {
       text-align: center;
-      padding: 24px 32px;
+      font-size: clamp(32px, 5vw, 72px);
+      font-weight: 800;
+      color: var(--muted);
+      letter-spacing: 1px;
+      animation: pulse 2s ease-in-out infinite;
     }
 
-    .content {
-      max-width: 95vw;
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.45; }
     }
 
+    /* ===== GLASSMORPHISM İÇERİK KARTI ===== */
+    .glass-card {
+      /* Yarı saydam beyaz zemin */
+      background: rgba(255,255,255,0.58);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.72);
+      border-radius: 24px;
+      box-shadow: 0 8px 40px rgba(44,90,160,0.13), 0 2px 8px rgba(0,0,0,0.06);
+      padding: clamp(28px, 4vw, 64px) clamp(32px, 6vw, 90px);
+      text-align: center;
+      max-width: 92vw;
+      width: 100%;
+    }
+
+    /* Sempozyum / etkinlik adı — üstte */
+    .symposium-title {
+      margin: 0 0 18px;
+      font-size: clamp(24px, 2.6vw, 46px);
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: .3px;
+    }
+
+    /* Konu — ortada, kırmızı */
     .topic {
-      margin: 0 0 24px;
-      font-size: clamp(36px, 5vw, 90px);
+      margin: 0 0 20px;
+      font-size: clamp(30px, 3.6vw, 64px);
       font-weight: 800;
       text-transform: uppercase;
-      color: #24364f;
+      color: var(--red);
+      word-break: break-word;
     }
 
+    /* Konuşmacı — altta, en büyük ama ölçülü */
     .speaker {
       margin: 0;
-      font-size: clamp(34px, 7vw, 108px);
+      font-size: clamp(40px, 5.5vw, 96px);
       font-weight: 900;
-      color: #161f2c;
+      color: var(--text);
       text-transform: uppercase;
+      word-break: break-word;
     }
 
+    /* ===== ALT KAYAN BANT ===== */
     .bottom {
       background: var(--red);
       color: #fff;
-      height: 86px;
+      height: 80px;
       display: flex;
       align-items: center;
       overflow: hidden;
@@ -97,20 +147,23 @@
       display: inline-block;
       white-space: nowrap;
       transform: translateX(100vw);
-      animation: ticker 22s linear infinite;
-      font-size: clamp(22px, 2vw, 34px);
+      animation: ticker 24s linear infinite;
+      font-size: clamp(20px, 1.9vw, 32px);
       font-weight: 700;
     }
 
     @keyframes ticker {
-      0% { transform: translateX(100vw); }
+      0%   { transform: translateX(100vw); }
       100% { transform: translateX(-100%); }
     }
   </style>
 </head>
 <body>
+
+  <!-- Üst header: logo + kurum adı -->
   <header class="header">
-    <img id="logo" class="logo" src="logo.png" alt="Logo" onerror="this.style.display='none'" />
+    <img id="logo" class="logo" src="img/hastane.png" alt="Logo"
+         onerror="this.style.display='none'" />
     <div class="titles">
       <div class="line1">T.C. SAĞLIK BAKANLIĞI</div>
       <div class="line2">İSTANBUL İL SAĞLIK MÜDÜRLÜĞÜ</div>
@@ -118,66 +171,96 @@
     </div>
   </header>
 
+  <!-- Ana merkez alanı -->
   <main class="center">
-    <div class="content">
-      <h1 id="topic" class="topic"></h1>
-      <h2 id="speaker" class="speaker"></h2>
+    <!-- Bekleme modu: yayın yokken gösterilir -->
+    <div id="waitingMsg" class="waiting">YAYIN BEKLENİYOR</div>
+
+    <!-- Glassmorphism içerik kartı: yayın varken gösterilir -->
+    <div id="contentCard" class="glass-card" style="display:none;">
+      <p  id="symposiumTitle" class="symposium-title"></p>
+      <h1 id="topic"          class="topic"></h1>
+      <h2 id="speaker"        class="speaker"></h2>
     </div>
   </main>
 
+  <!-- Alt kayan bant: sadece duyuru metni (ticker); yoksa kurumsal varsayılan -->
   <footer class="bottom">
     <div id="marquee" class="marquee"></div>
   </footer>
 
   <script>
     (function () {
-      const STORAGE_STATE_KEY = "konferans_state";
-      const CHANNEL_NAME = "konferans_channel";
+      /* ===== Sabitler ===== */
+      var STORAGE_KEY  = "konferans_state";
+      var CHANNEL_NAME = "konferans_channel";
+      /* Kurumsal varsayılan alt bant metni */
+      var DEFAULT_TICKER =
+        "S.B. Marmara Üniversitesi Pendik Eğitim ve Araştırma Hastanesi" +
+        " | Prof. Dr. Işıl Barlan Konferans Salonu";
 
-      const defaultState = {
-        speaker: "",
-        symposium: "",
-        topic: "",
-        ticker: ""
-      };
+      var defaultState = { speaker: "", symposium: "", topic: "", ticker: "" };
 
-      const topicEl = document.getElementById("topic");
-      const speakerEl = document.getElementById("speaker");
-      const marqueeEl = document.getElementById("marquee");
+      /* DOM referansları */
+      var waitingEl    = document.getElementById("waitingMsg");
+      var cardEl       = document.getElementById("contentCard");
+      var symposiumEl  = document.getElementById("symposiumTitle");
+      var topicEl      = document.getElementById("topic");
+      var speakerEl    = document.getElementById("speaker");
+      var marqueeEl    = document.getElementById("marquee");
 
+      /* localStorage okuma */
       function readState() {
         try {
-          const raw = localStorage.getItem(STORAGE_STATE_KEY);
-          if (!raw) return { ...defaultState };
-          return { ...defaultState, ...JSON.parse(raw) };
+          var raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return Object.assign({}, defaultState);
+          return Object.assign({}, defaultState, JSON.parse(raw));
         } catch (_) {
-          return { ...defaultState };
+          return Object.assign({}, defaultState);
         }
       }
 
+      /* Ekranı güncelle */
       function render(state) {
-        topicEl.textContent = state.topic || "";
-        speakerEl.textContent = state.speaker || "";
+        var hasSpeaker   = !!state.speaker.trim();
+        var hasTopic     = !!state.topic.trim();
+        var hasSymposium = !!state.symposium.trim();
+        var hasContent   = hasSpeaker || hasTopic || hasSymposium;
 
-        const barText = [state.symposium, state.ticker].filter(Boolean).join(" / ");
-        marqueeEl.textContent = barText || "";
+        /* Bekleme modu / içerik kartı geçişi */
+        waitingEl.style.display = hasContent ? "none"  : "";
+        cardEl.style.display    = hasContent ? ""      : "none";
+
+        /* Kart içerikleri (textContent → XSS güvenli) */
+        symposiumEl.textContent = state.symposium || "";
+        topicEl.textContent     = state.topic     || "";
+        speakerEl.textContent   = state.speaker   || "";
+
+        /* Alt bant: ticker varsa ticker; yoksa kurumsal varsayılan.
+           Sempozyum adı ASLA gösterilmez. */
+        var bandText = state.ticker.trim() || DEFAULT_TICKER;
+        marqueeEl.textContent = bandText;
+        /* Animasyonu sıfırla (akıcı yeniden başlasın) */
         marqueeEl.style.animation = "none";
         void marqueeEl.offsetWidth;
         marqueeEl.style.animation = "";
       }
 
+      /* İlk yükleme */
       render(readState());
 
+      /* BroadcastChannel: aynı tarayıcıda anlık güncelleme */
       if ("BroadcastChannel" in window) {
-        const channel = new BroadcastChannel(CHANNEL_NAME);
-        channel.addEventListener("message", function (event) {
-          if (!event.data || event.data.type !== "state_update") return;
-          render({ ...defaultState, ...event.data.payload });
+        var ch = new BroadcastChannel(CHANNEL_NAME);
+        ch.addEventListener("message", function (e) {
+          if (!e.data || e.data.type !== "state_update") return;
+          render(Object.assign({}, defaultState, e.data.payload));
         });
       }
 
-      window.addEventListener("storage", function (event) {
-        if (event.key !== STORAGE_STATE_KEY) return;
+      /* Storage event: farklı sekmelerde senkron */
+      window.addEventListener("storage", function (e) {
+        if (e.key !== STORAGE_KEY) return;
         render(readState());
       });
     })();
