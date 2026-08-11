@@ -1,40 +1,76 @@
-# Konferans Salonu (Sunucusuz Statik Yapı)
+# Konferans Salonu Ekran Sistemi
 
-Bu proje, **Node.js / port / WebSocket gerektirmeden** çalışan, IIS altında servis edilen saf statik bir konferans salonu kürsü ekran sistemidir.
+Sunucusuz, saf statik, vanilla HTML/CSS/JS sistemi.  
+İki dosya: **yonet.html** (yönetici paneli) ve **kursu.html** (kürsü/sahne ekranı).
 
-## Dosyalar
+---
 
-- `yonet.html` → Yönetici Ekranı
-- `kursu.html` → Kürsü Ekranı (seyircinin gördüğü büyük ekran)
+## Dosya Yapısı
 
-## Kurulum (IIS)
+```
+/
+├── yonet.html       Yönetici paneli
+├── kursu.html       Kürsü/sahne ekranı (projeksiyon/LED'e bağlı)
+└── img/
+    └── hastane.png  Kurumsal logo (geniş oranlı, yaklaşık 3067×914)
+```
 
-1. Bu repodaki dosyaları şu klasöre kopyalayın:
-   - `C:\inetpub\wwwroot\Admin\konferans_salonu\`
-2. Ek kurulum gerekmez.
-   - Node.js gerekmez
-   - Port ayarı gerekmez
-   - Sunucu tarafı uygulama gerekmez
+---
 
-## Erişim Adresleri
+## Senkronizasyon
 
-- Yönetici Ekranı: `http://10.201.65.10/Admin/konferans_salonu/yonet.html`
-- Kürsü Ekranı: `http://10.201.65.10/Admin/konferans_salonu/kursu.html`
+| Mekanizma | Detay |
+|-----------|-------|
+| `localStorage` | Anahtar: `konferans_state` · Değer: `{ speaker, symposium, topic, ticker }` |
+| `BroadcastChannel` | Kanal: `konferans_channel` · Mesaj tipi: `state_update` |
 
-## Kullanım
+Aynı tarayıcıda birden fazla sekme açıksa BroadcastChannel anlık günceller;  
+farklı tarayıcılar/cihazlar `storage` olayıyla senkronize olur.
 
-1. Yönetici ve Kürsü ekranlarını **aynı bilgisayarda, aynı tarayıcıda** (farklı sekme/pencere) açın.
-2. Yönetici ekranında konuşmacı, sempozyum, konu ve duyuru bilgilerini girin.
-3. `CANLI YAYINA GÖNDER` ile kürsü ekranını anında güncelleyin.
-4. Alt yazı/duyuru satırı için `YAYINLA` ve `KALDIR` butonlarını kullanın.
+---
 
-## Logo Notu
+## Özellikler
 
-- Kürsü ekranı `logo.png` dosyasını kök klasörden yüklemeyi dener.
-- Logo kullanmak için `logo.png` dosyasını aynı klasöre ekleyin.
-- Dosya yoksa ekran bozulmaz; logo otomatik gizlenir.
+### Kürsü Ekranı (`kursu.html`)
+- **Aydınlık / beyaz tema** — kurumsal, projeksiyon ve LED uyumlu.
+- **Ortalı 3'lü blok:**
+  - Üstte → Seminer/Etkinlik adı (gri, büyük)
+  - Ortada → Konu (**kırmızı**, daha büyük)
+  - Altta → Konuşmacı adı (**en büyük**, koyu)
+- **Logo oranı korunur:** `img/hastane.png` geniş oranlı; `width` bazlı ölçekleme,
+  `height: auto` ile en-boy oranı bozulmaz. `max-width: 480px`, `max-height: 90px`.
+- **"Yayın Bekleniyor"** modu: veri yokken sayfanın tam ortasında büyük pulse animasyonlu metin.
+  Header (logo + saat) ve alt bant görünmeye devam eder.
+- **Alt kırmızı kayan bant:** veri varsa `sempozyum / duyuru`; veri yoksa kurumsal varsayılan metin dönmeye devam eder:
+  > S.B. Marmara Üniversitesi Pendik Eğitim ve Araştırma Hastanesi | Prof. Dr. Işıl Barlan Konferans Salonu
+- **Tam ekran butonu kürsüden KALDIRILDI** → artık sadece yönetici panelinde.
 
-## Teknik Not
+### Yönetici Paneli (`yonet.html`)
+- Sol sütun: Yayın Yönetimi · Sayaç · Kayıt Listeleri.
+- Sağ sütun: Canlı Önizleme (gerçeğe sadık, küçük ölçekli).
+- **Glassmorphism butonlar:** `idle` halde renksiz cam efekti;
+  `hover`'da anlam rengi (Canlı Yayına Gönder → yeşil, Duyuru → mor,
+  Tümünü Kaldır → kırmızı, vb.) + `translateY(-2px)` yükselme.
+- **Kompakt sayaç kartı:** dakika gir → Başlat / Duraklat / Sıfırla.
+  Son 60 sn sarı, son 30 sn kırmızı yanıp söner, bitince "SÜRE DOLDU".
+  Sayaç yalnızca panelde görünür; kürsüye gönderilmez.
+- **"Tam Ekran Yap" butonu** üst çubukta: yönetici sayfasını tam ekran yapar/çıkar.
+  Kürsü sayfasında bu buton **görünmez**.
+- Alan etiketleri: `Seminer/Etkinlik/Toplantı İsmi` ve `Seminer/Etkinlik/Toplantı Konusu`.
+- Tüm input'larda pasif renkli placeholder (yazınca kaybolur).
+- Ctrl+Enter ile hızlı "Canlı Yayına Gönder".
+- Toast bildirimleri, durum göstergesi (yeşil nabız dot).
 
-Senkronizasyon, aynı tarayıcı ve aynı bilgisayar senaryosu için `BroadcastChannel` + `localStorage` (`storage` event yedeği) ile çalışır.
-Farklı cihazlar arası gerçek zamanlı senkron için ileride sunucu tarafı bir çözüm gerekir.
+---
+
+## Renk Değişkenleri
+
+Her iki dosyada da `:root` bloğunda CSS değişkenleri tanımlıdır.  
+Tema veya renk değiştirmek için yalnızca bu değişkenleri düzenleyin.
+
+---
+
+## Dağıtım
+
+IIS altında statik dosya olarak sunulur; port/Node/framework gerekmez.  
+Üretimde `img/hastane.png` dosyasının IIS klasöründe mevcut olduğundan emin olun.
